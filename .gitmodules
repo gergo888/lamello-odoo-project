@@ -1,6 +1,0 @@
-[submodule "lamello_customizations"]
-	path = lamello_customizations
-	url = https://github.com/lamello-furniture/lamello_customizations.git
-[submodule "lamello_timber"]
-	path = lamello_timber
-	url = https://github.com/lamello-furniture/lamello_timber.git
