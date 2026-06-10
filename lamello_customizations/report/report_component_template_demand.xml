@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<!-- Alkatrészlista (Igény alapján) — same layout as Tervezett, demand parser supplies filtered data -->
+<template id="report_component_template_demand">
+    <t t-call="lamello_customizations.report_component_template"/>
+</template>
+</odoo>

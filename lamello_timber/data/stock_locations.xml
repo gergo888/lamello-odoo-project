@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+        <!-- 1. Szülő tárhely (Virtuális/View) -->
+        <record id="location_timber_root" model="stock.location">
+            <field name="name">Rönkfelvásárlás és feldolgozás</field>
+            <field name="usage">view</field>
+            <!--
+            <field name="location_id" ref="stock.stock_location_locations"/>
+            -->
+        </record>
+
+        <!-- 2. Production tárhely (Virtuális/Production) -->
+        <record id="location_timber_production" model="stock.location">
+            <field name="name">Rönkfeldolgozás</field>
+            <field name="usage">production</field>
+            <field name="location_id" ref="location_timber_root"/>
+        </record>
+    </data>
+</odoo>

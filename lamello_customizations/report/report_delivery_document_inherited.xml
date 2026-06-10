@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<template id="report_delivery_document_inherited" inherit_id="stock.report_delivery_document">
+
+    <xpath expr="//div[@id='informations']" position="attributes">
+        <attribute name="t-if">o.delivery_slip_type != 'export'</attribute>
+    </xpath>
+
+    <xpath expr="//div[@id='informations']" position="after">
+    <t t-if="o.delivery_slip_type == 'export'">
+        <div id="informations" class="row mb-4">
+            <div t-if="o.delivery_week" class="col-2 mb-2" name="div_delivery_week">
+                <strong>Woche<br/>Hét</strong>
+                <div t-field="o.delivery_week" class="m-0"/>
+            </div>
+
+            <div t-if="o.state" class="col-3 mb-2" name="div_verladen_date">
+                <strong>Shipping Date<br/>Wurde verladen am</strong>
+                <div t-if="o.state == 'done'" t-field="o.date_done" t-options='{"widget": "date"}' class="m-0"/>
+                <div t-else="" t-field="o.scheduled_date" t-options='{"widget": "date"}' class="m-0"/>
+            </div>
+            <div class="col col-2 mw-100 mb-2">
+                <strong>Menge<br/>db</strong>
+                <div t-field="o.total_qty" class="m-0">1</div>
+            </div>
+            <div t-if="o.total_parcel_qty" class="col col-2 mw-100 mb-2">
+                <strong>Kolli<br/>Csomag</strong>
+                <div t-field="o.total_parcel_qty" class="m-0">1</div>
+            </div>
+            <div t-if="o.total_weight" class="col col-2 mw-100 mb-2">
+                <strong>Gesamtgewicht<br/>Összsúly</strong>
+                <div t-field="o.total_weight" class="m-0">1</div>
+            </div>
+            <div t-if="o.total_volume" class="col col-2 mw-100 mb-2">
+                <strong>m3<br/>m3 össz.</strong>
+                <div t-field="o.total_volume" class="m-0">1</div>
+            </div>
+        </div>
+    </t>
+    </xpath>
+
+    <xpath expr="//table[@name='stock_move_line_table']" position="attributes">
+        <attribute name="t-elif">o.move_line_ids and o.state=='done' and o.delivery_slip_type != 'export'</attribute>
+    </xpath>
+
+    <xpath expr="//table[@name='stock_move_line_table']" position="after">
+        <table class="table table-sm table-borderless" t-elif="o.move_line_ids and o.state=='done'" name="stock_move_line_table">
+            <thead>
+                <tr>
+                    <th name="th_sml_product" style="width: 30%;">Produkt</th>
+                    <th></th>
+                    <th style="width: 100%;"></th>
+                    <th name="th_sml_qty_ordered" class="text-end" t-if="not has_serial_number">Menge<br/>db</th>
+                    <th name="lot_serial" class="text-end" t-else="">Lot/Serial Number</th>
+                    <th name="th_sml_quantity" class="text-end">Kolli<br/>Csomag</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <!-- megrendelés szerint csoportosítva -->
+                <t t-set="orders_with_ref" t-value="o.move_line_ids.mapped('move_id.sale_line_id.order_id').filtered(lambda r: r.client_order_ref)"/>
+                
+                <t t-foreach="orders_with_ref" t-as="order">
+                    <tr class="o_line_section">
+                        <td colspan="99" class="bg-secondary" name="order_info">
+                            <span class="ms-1" t-field="order.client_order_ref"/>
+                        </td>
+                    </tr>
+                    <!--
+                    <t t-set="order_move_lines" t-value="o.move_line_ids.filtered(lambda l: l.move_id.sale_line_id.order_id == order)"/>
+                    -->
+                    <t t-set="order_move_lines" t-value="o.move_line_ids.filtered(lambda l: l.move_id.sale_line_id.order_id == order).sorted(key=lambda l: l.move_id.sale_line_id.sequence)"/>
+                    <t t-foreach="order_move_lines" t-as="move_line">
+                        <tr>
+                            <td colspan="3">
+                                <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                    <span>-- </span>
+                                </t>
+                                <span t-field="move_line.product_id"/>
+                                <p t-if="move_line.move_id.description_picking
+                                        and move_line.move_id.description_picking != move_line.product_id.display_name
+                                        and move_line.move_id.description_picking != move_line.product_id.name"
+                                   style="margin: 0;">
+                                    <span t-out="move_line.move_id.description_picking" t-options="{'widget': 'text'}"/>
+                                </p>
+                            </td>
+                            <td class="text-end"><span t-out="format_number(move_line.quantity)"/> <span t-field="move_line.product_uom_id"/> </td>
+                            <td class="text-end">
+                                <span t-out="format_number(move_line.line_parcel_qty)"/> 
+                                
+                                <span t-field="move_line.product_uom_id"/>
+                                
+                            </td>
+                        </tr>
+                        <tr t-if="move_line.product_id.invoice_name">
+                            <td colspan="3">
+                                <span t-field="move_line.product_id.invoice_name"/>
+                            </td>
+                        </tr>
+                    </t>
+                </t>
+
+                <!-- csoportosítás nélkül -->
+                
+                <t t-set="no_ref_lines" t-value="o.move_line_ids.filtered(lambda l: not l.move_id.sale_line_id.order_id or not l.move_id.sale_line_id.order_id.client_order_ref)"/>
+                
+                <t t-set="order_move_lines" t-value="o.move_line_ids.filtered(lambda l: l.move_id.sale_line_id.order_id == order).sorted(key=lambda l: l.move_id.sale_line_id.sequence)"/>
+                <t t-if="no_ref_lines">
+
+                    <tr t-if="orders_with_ref">
+                        <td colspan="99" style="height: 20px;"></td> 
+                    </tr>
+                    <t t-foreach="no_ref_lines" t-as="move_line">
+                        <tr>
+                            <td colspan="3">
+                                <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                    <span>-- </span>
+                                </t>
+                                <span t-field="move_line.product_id"/>
+                                <p t-if="move_line.move_id.description_picking
+                                        and move_line.move_id.description_picking != move_line.product_id.display_name
+                                        and move_line.move_id.description_picking != move_line.product_id.name"
+                                   style="margin: 0;">
+                                    <span t-out="move_line.move_id.description_picking" t-options="{'widget': 'text'}"/>
+                                </p>
+                            </td>
+
+                            <td class="text-end"><span t-out="format_number(move_line.quantity)"/> <span t-field="move_line.product_uom_id"/> </td>
+                            
+                            <td class="text-end">
+                                <span t-out="format_number(move_line.line_parcel_qty)"/> 
+                                
+                                <span t-field="move_line.product_uom_id"/>
+                                
+                            </td>
+
+                        </tr>
+                        <tr t-if="move_line.product_id.invoice_name">
+                            <td colspan="3">
+                                <span t-field="move_line.product_id.invoice_name"/>
+                            </td>
+                        </tr>
+                    </t>
+                </t>
+                
+            </tbody>
+
+        </table>
+    </xpath>
+</template>
+</odoo>

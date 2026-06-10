@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_mo_components_document">
+        <t t-call="web.basic_layout">
+            <div class="page">
+                <h2 class="text-center mb-4">Gyártási Rendelések és Komponensek</h2>
+                
+                <table class="table table-sm table-striped">
+                    <thead style="background-color: #f2f2f2;">
+                        <tr>
+                            <th>MO Referencia</th>
+                            <th>Termék</th>
+                            <th>Állapot</th>
+                            <th>Komponensek (Termék - Mennyiség)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="docs" t-as="mo">
+                            <tr>
+                                <td class="align-middle"><strong><t t-esc="mo.name"/></strong></td>
+                                <td class="align-middle"><t t-esc="mo.product_id.display_name"/></td>
+                                <td class="align-middle"><t t-esc="dict(mo._fields['state'].selection).get(mo.state)"/></td>
+                                <td>
+                                    <ul class="list-unstyled mb-0">
+                                        <t t-foreach="mo.move_raw_ids" t-as="line">
+                                            <li>
+                                                <i class="fa fa-caret-right mr-1"/>
+                                                <t t-esc="line.product_id.name"/>: 
+                                                <t t-esc="line.product_uom_qty"/> 
+                                                <t t-esc="line.product_uom.name"/>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_mo_components">
+        <t t-call="web.html_container">
+            <t t-call="lamello_customizations.report_mo_components_document"/>
+        </t>
+    </template>
+</odoo>

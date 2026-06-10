@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1"> <!-- A noupdate="1" biztosítja, hogy ha kézzel módosítod az Odoo-ban, a frissítés ne írja felül -->
+
+        <!-- CSOPORTOK DEFINIÁLÁSA -->
+        <record id="group_fenekek" model="mrp.component.group">
+            <field name="name">Fenekek</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_oldalak" model="mrp.component.group">
+            <field name="name">Oldalak</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="group_tetok" model="mrp.component.group">
+            <field name="name">Tetők</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="group_valaszfalak" model="mrp.component.group">
+            <field name="name">Válaszfalak</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="group_polcok" model="mrp.component.group">
+            <field name="name">Polcok</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- KÓDOK HOZZÁRENDELÉSE (component_codes) -->
+        <record id="code_f1" model="mrp.component.group.code">
+            <field name="name">F1</field>
+            <field name="group_id" ref="group_fenekek"/>
+        </record>
+
+        <record id="code_o1" model="mrp.component.group.code">
+            <field name="name">O1</field>
+            <field name="group_id" ref="group_oldalak"/>
+        </record>
+
+        <record id="code_t1" model="mrp.component.group.code">
+            <field name="name">T1</field>
+            <field name="group_id" ref="group_tetok"/>
+        </record>
+
+        <record id="code_v1" model="mrp.component.group.code">
+            <field name="name">V1</field>
+            <field name="group_id" ref="group_valaszfalak"/>
+        </record>
+
+        <record id="code_p1" model="mrp.component.group.code">
+            <field name="name">P1</field>
+            <field name="group_id" ref="group_polcok"/>
+        </record>
+
+        <!-- KULCSSZAVAK HOZZÁRENDELÉSE (keywords) -->
+        <record id="kw_fenek" model="mrp.component.group.keyword">
+            <field name="name">Fenék</field>
+            <field name="group_id" ref="group_fenekek"/>
+        </record>
+
+        <record id="kw_oldal" model="mrp.component.group.keyword">
+            <field name="name">Oldal</field>
+            <field name="group_id" ref="group_oldalak"/>
+        </record>
+
+        <record id="kw_teto" model="mrp.component.group.keyword">
+            <field name="name">Tető</field>
+            <field name="group_id" ref="group_tetok"/>
+        </record>
+
+        <record id="kw_valaszfal" model="mrp.component.group.keyword">
+            <field name="name">Válaszfal</field>
+            <field name="group_id" ref="group_valaszfalak"/>
+        </record>
+
+        <record id="kw_polc" model="mrp.component.group.keyword">
+            <field name="name">Polc</field>
+            <field name="group_id" ref="group_polcok"/>
+        </record>
+
+    </data>
+</odoo>

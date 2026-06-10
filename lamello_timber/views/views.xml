@@ -1,0 +1,1416 @@
+<odoo>
+  <data>
+
+    <!-- Fatípusok list -->
+    <record id="view_lamello_fafajtak_list" model="ir.ui.view">
+        <field name="name">lamello.faronk.list</field>
+        <field name="model">lamello.woodtype</field>
+        <field name="arch" type="xml">
+            <list string="Fatípusok">
+                <field name="name"/>
+                <field name="species"/>
+                <field name="quality"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Fatípusok form -->
+    <record id="view_lamello_fafajtak_form" model="ir.ui.view">
+        <field name="name">lamello.faronk.form</field>
+        <field name="model">lamello.woodtype</field>
+        <field name="arch" type="xml">
+            <form string="Fatípusok">
+                <sheet>
+                    <group col="4">
+                        <field name="wood_group"/>
+                        <field name="species"/>
+                    </group>
+                    <group col="4">
+                        <field name="quality"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Erdőgazdaságok form -->
+    <record id="view_lamello_erdogazdasag_form" model="ir.ui.view">
+        <field name="name">lamello.erdogazdasag.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_type']" position="after">
+                <group>
+                    <field name="is_forestry_company" string="Erdészeti/fűrészárú beszállító" readonly="True"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tárhelyek list -->
+    <record id="view_lamello_timberstack_location_list" model="ir.ui.view">
+        <field name="name">lamello.timberlocation.list</field>
+        <field name="model">lamello.timberlocation</field>
+        <field name="arch" type="xml">
+            <list string="Tárhelyek">
+                <field name="name"/>
+                <field name="location_type"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tárhelyek form -->
+    <record id="view_lamello_timberstack_location_form" model="ir.ui.view">
+        <field name="name">lamello.timberstack.location.form</field>
+        <field name="model">lamello.timberlocation</field>
+        <field name="arch" type="xml">
+            <form string="Tárhelyek">
+                <sheet>
+                    <group col="4">
+                        <field name="location_type"/>
+                    </group>
+                    <group col="4">
+                        <field name="address"/>
+                        <field name="to_manufacture" invisible="location_type != 'store'"/>
+                        <field name="location_scope"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Rönkjegyzék list -->
+    <record id="view_lamello_faronk_list" model="ir.ui.view">
+        <field name="name">lamello.ronkjegyzek.list</field>
+        <field name="model">lamello.ronkjegyzek</field>
+        <field name="arch" type="xml">
+            <list string="Rönkjegyzék">
+                <field name="name"/>
+                <field name="erdogazdasag_ids" widget="many2many_tags"/>
+                <field name="faronk_id"/>
+                <field name="open_date"/>
+                <field name="close_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Rönkjegyzék form -->
+    <record id="view_faronk_faronkjegyzek_form" model="ir.ui.view">
+        <field name="name">lamello.ronkjegyzek.form</field>
+        <field name="model">lamello.ronkjegyzek</field>
+        <field name="arch" type="xml">
+            <form string="Rönkjegyzék">
+                <header>
+                    <field name="state"
+                        widget="statusbar"
+                        statusbar_visible="open,confirmed,closed"
+                        invisible="state == 'cancel'"/>
+                    <field name="state"
+                        widget="statusbar"
+                        statusbar_visible="cancel"
+                        invisible="state != 'cancel'"/>
+
+                    <button name="action_confirm"
+                        invisible="state != 'open'"
+                        string="Megerősít"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="m"/>
+
+                    <button name="action_transfer"
+                        invisible="state != 'confirmed'"
+                        string="Átvétel"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="a"/>
+
+                    <button name="action_processing"
+                        invisible="state != 'confirmed'"
+                        string="Feldolgozás"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="f"/>
+
+                    <button name="action_close"
+                        invisible="state != 'confirmed'"
+                        string="Lezárás"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="j"/>
+
+                    <button name="action_cancel"
+                        invisible="state == 'cancel'"
+                        string="Érvénytelenít"
+                        type="object"
+                        data-hotkey="e"/>
+
+                    <button name="action_create_new"
+                        invisible="state != 'cancel'"
+                        string="Új létrehozása"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="u"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label">Rönkjegyzék</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="mb-3"/>
+                    <hr/>
+                    <group>
+                        <group>
+                            <field name="purchase_order_ids" readonly="state != 'open'" widget="many2many_tags" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="single_erdogazdasag_id" readonly="1"
+                                widget="res_partner_many2one"
+                                invisible="has_multiple_partners"
+                                string="Beszállító"/>
+                            <field name="erdogazdasag_ids" readonly="1"
+                                invisible="not has_multiple_partners">
+                                <list string="Beszállítók" create="0" delete="0">
+                                    <field name="name"/>
+                                </list>
+                            </field>
+                            <field name="faronk_id"
+                                readonly="state != 'open'"
+                                options="{'no_create': True, 'no_quick_create': True}"/>
+                           
+                            <field name="purchase_date" readonly="state != 'open'"/>
+                            <field name="expected_date" readonly="state != 'open'"/>
+                        </group>
+                        <group>
+                            <field name="open_date" readonly="state != 'open'"/>
+                            <field name="close_date" readonly="state != 'confirmed'"/>
+                        </group>
+                    </group>
+                    <div class="mb-3"/>
+
+                    <field name="faronk_line_ids"
+                        readonly="state not in ['open', 'confirmed']">
+                        <list string="Tételek" editable="bottom" limit="200">
+                            <field name="po_id"
+                                width="15%"
+                                column_invisible="parent.has_single_po"
+                                domain="[('id', 'in', parent.purchase_order_ids)]"
+                                options="{'no_create': True, 'no_quick_create': True}"/>
+                            <!--
+                            <field name="po_partner_id" width="15%" readonly="1"/>
+                            -->
+                            <field name="tikett" width="12%"/>
+                            <field name="hosszusag" width="10%"/>
+                            <field name="atmero" width="10%"/>
+                            <field name="m3" width="10%" readonly="1"/>
+                            <field name="elteres_m3" width="10%" readonly="1"/>
+                            <field name="timber_location_id" string="Átvétel helye" width="12%" readonly="1"/>
+                            <field name="state" width="10%" readonly="1"/>
+                        </list>
+                    </field>
+                    <div class="row mt-3">
+                        <div class="col-7">
+                            <field name="description" widget="html"
+                                nolabel="1"
+                                readonly="state != 'open'"
+                                placeholder="Megjegyzés..."
+                                style="min-height: 180px;"/>
+                        </div>
+                        <div class="col-5">
+                            <group class="oe_subtotal_footer" name="faronk_total"
+                                style="padding-top: 20px; font-weight: bold; font-size: 20px;">
+                                <field string="Térfogat összesen (m3)" name="m3"
+                                    colspan="2" readonly="1" widget="float"/>
+                                <field string="átvett (m3)" name="total_received_volume"
+                                    colspan="2" readonly="1" widget="float"/>
+                                <field string="feldolgozott (m3)" name="total_processed_volume"
+                                    colspan="2" readonly="1" widget="float"/>
+                                <field string="Mennyiség összesen (db)" name="db"
+                                    colspan="2" readonly="1" widget="integer"/>
+                                <field string="átvett (db)" name="total_received_quantity"
+                                    colspan="2" readonly="1" widget="integer"/>
+                                <field string="feldolgozott (db)" name="total_processed_quantity"
+                                    colspan="2" readonly="1" widget="integer"/>
+                            </group>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Rönkátvétel list (Odoo 19: list -> list) -->
+    <record id="view_lamello_ronkatvetel_list" model="ir.ui.view">
+        <field name="name">lamello.ronkatvetel.list</field>
+        <field name="model">lamello.ronkatvetel</field>
+        <field name="arch" type="xml">
+            <list string="Rönkátvétel">
+                <field string="Rönkjegyzék" name="ronkjegyzek_name"/>
+                <field name="erdogazdasag_ids" widget="many2many_tags"/>
+                <field name="faronk_id"/>
+                <field name="name"/>
+                <field name="timber_location_id"/>
+                <field name="total_received_quantity"/>
+                <field name="total_received_volume"/>
+                <field name="date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Rönkátvétel form -->
+    <record id="view_faronk_ronkatvetel_form" model="ir.ui.view">
+        <field name="name">lamello.ronkatvetel.form</field>
+        <field name="model">lamello.ronkatvetel</field>
+        <field name="arch" type="xml">
+            <form string="Rönkátvétel" create="false">
+                <header>
+                    <field name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,approved"
+                        invisible="state == 'cancel'"/>
+                    <field name="state"
+                        widget="statusbar"
+                        statusbar_visible="cancel"
+                        invisible="state != 'cancel'"/>
+
+                    <button name="action_confirm"
+                        invisible="state != 'draft'"
+                        string="Átvétel"
+                        class="btn-primary"
+                        type="object"
+                        data-hotkey="v"/>
+                    <button name="action_create_new"
+                        invisible="state != 'cancel'"
+                        string="Új létrehozása"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="a"/>
+                    <!--
+                    <button name="action_cancel"
+                        invisible="state != 'approved'"
+                        string="Érvénytelenít"
+                        type="object"
+                        data-hotkey="e"/>
+                    -->
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label">Rönkátvételi jegyzék</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="mb-3"/>
+                    <hr/>
+                    <group>
+                        <group>
+                            <field name="ronkjegyzek_id" readonly="state != 'draft'"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="delivery_note" readonly="state != 'draft'"/>
+                            <field name="timber_location_id" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="erdogazdasag_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="faronk_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <field name="transfer_line_ids" readonly="state != 'draft'">
+                        <list string="Tételek" editable="bottom" limit="200" create="0">
+                            <field name="source_faronkline_id" column_invisible="True" force_save="1"/>
+                            <field name="tikett" readonly="1" force_save="1"/>
+                            <field name="hosszusag" readonly="1" force_save="1"/>
+                            <field name="atmero" readonly="1" force_save="1"/>
+                            <field name="m3" readonly="1" force_save="1"/>
+                            <field name="atvett_hosszusag"/>
+                            <field name="atvett_atmero"/>
+                            <field name="atvett_m3" readonly="1" force_save="1"/>
+                        </list>
+                    </field>
+
+                    <group class="oe_subtotal_footer" colspan="2"
+                        style="padding-top: 20px; font-weight: bold; font-size: 20px;">
+                        <field string="Átvett térfogat (m3)" name="total_received_volume"
+                            colspan="2" readonly="1" widget="float"/>
+                        <field string="Átvett mennyiség (db)" name="total_received_quantity"
+                            colspan="2" readonly="1" widget="integer"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Rönkfeldolgozás list -->
+    <record id="view_lamello_ronkfeldolgozas_list" model="ir.ui.view">
+        <field name="name">lamello.ronkfeldolgozas.list</field>
+        <field name="model">lamello.ronkfeldolgozas</field>
+        <field name="arch" type="xml">
+            <list string="Rönkfeldolgozás">
+                <field string="Rönkjegyzék" name="ronkjegyzek_name"/>
+                <field name="erdogazdasag_ids" widget="many2many_tags"/>
+                <field name="faronk_id"/>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!-- Rönkfeldolgozás from -->
+    <record id="view_faronk_ronkfeldolgozas_form" model="ir.ui.view">
+        <field name="name">lamello.ronkfeldolgozas.form</field>
+        <field name="model">lamello.ronkfeldolgozas</field>
+        <field name="arch" type="xml">
+                <form string="Rönkfeldolgozás">
+                    <header>
+                        <field name="state" 
+                            widget="statusbar"
+                            statusbar_visible="draft, approved"
+                            invisible="state == 'cancel'"/>
+                        <field name="state" 
+                            widget="statusbar"
+                            statusbar_visible="cancel"
+                            invisible="state != 'cancel'"/>
+
+                        <button name="action_confirm" 
+                            invisible="state not in ['draft']" 
+                            string="Feldolgoz" 
+                            class="oe_highlight"
+                            type="object"/>
+                        <button name="action_create_new" 
+                            invisible="state != 'cancel'" 
+                            string="Új létrehozása" 
+                            type="object" 
+                            class="oe_highlight"
+                            data-hotkey="a"/>
+                        <!--
+                        <button name="action_cancel" 
+                            invisible="state not in ['approved']" 
+                            string="Érvénytelenít" 
+                            type="object" 
+                            data-hotkey="e"/>
+                        -->
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <span class="o_form_label">Rönkfedldolgozási jegyzék</span>
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <div class="mb-3"/>
+                        <hr/>
+                        <group>
+                            <group>
+                                <field name="ronkjegyzek_id" readonly="state != 'draft'"/>
+                                <field name="date" readonly="state != 'draft'"/>
+                            </group>
+                            <group>
+                                <field name="erdogazdasag_ids" widget="many2many_tags" readonly="1"/>
+                                <field name="faronk_id" readonly="1"/>
+                            </group>
+                        </group>
+                        <field name="processing_line_ids" readonly="state != 'draft'">
+                            <list string="Tételek" editable="bottom" limit="200" create="0">
+                                <field name="source_faronkline_id" column_invisible="True" force_save="1"/>
+                                <field name="tikett" readonly="1" force_save="1"/>
+                                <field name="atvett_hosszusag" readonly="1"/>
+                                <field name="atvett_atmero" readonly="1"/>
+                                <field name="atvett_m3" readonly="1" force_save="1"/>
+                            </list>
+                        </field>
+                        <group class="oe_subtotal_footer" colspan="2" style="padding-top: 20px; font-weight: bold; font-size: 20px;">
+                            <field string="Feldolgozott mennyiség (db)" name="total_processed_quantity" colspan="2" readonly="1" 
+                                widget="integer"/>                                
+                            <field string="Feldolgozott térfogat (m3)" name="total_processed_volume" colspan="2" readonly="1" 
+                                widget="float"/>
+                        </group>
+                    </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- Rakatok search  -->
+    <record id="view_lamello_rakat_search" model="ir.ui.view">
+        <field name="name">lamello.timberstack.search</field>
+        <field name="model">lamello.timberstack</field>
+        <field name="arch" type="xml">
+            <search string="Keresés">
+                <field name="stack_number"/>
+                <field name="wood_type_id"/>
+                <field name="thickness"/>
+
+                <separator/>
+                
+                <filter name="is_received" string="Átvett" domain="[('is_received','=',True)]"/>
+                <filter name="is_purchased" string="Vásárolt" domain="[('is_purchased','=',True)]"/>
+                <filter name="is_processed" string="Kezelt" domain="[('is_processed','=',True)]"/>
+                
+                <separator/>
+                
+                <group>
+                    <filter string="Állapot" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fatípus" name="group_by_wood" context="{'group_by': 'wood_type_id'}"/>
+                    <filter string="Vastagság" name="group_by_thickness" context="{'group_by': 'thickness'}"/>
+                </group>
+
+            </search>
+        </field>
+    </record>
+    <!-- Rakatok list -->
+
+    <record id="view_lamello_rakat_list" model="ir.ui.view">
+        <field name="name">lamello.timberstack.list</field>
+        <field name="model">lamello.timberstack</field>
+        <field name="arch" type="xml">
+            <list string="Rakatok" create="false">
+                <field name="stack_number"/>
+                <field name="wood_type_id"/>
+                <field name="thickness"/>
+                <field string="Térfogat (m3)" name="total_volume"/>
+                <field name="is_received"/>
+                <field name="is_purchased"/>
+                <field name="is_processed"/>
+                <field name="dryer_in_date"/>
+                <field name="dryer_out_date"/>
+                <field name="timber_location_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Rakat tételek list — commented out: lamello.timberstack.line removed
+    <record id="view_lamello_timber_line_list" model="ir.ui.view">
+        <field name="name">lamello.timberstack.line.list</field>
+        <field name="model">lamello.timberstack.line</field>
+        <field name="arch" type="xml">
+            <list string="Rakat Tételek - Csoportosítva">
+                <field name="timber_stack_id" invisible="1"/>
+                <field name="length"/>
+                <field name="width"/>
+                <field name="quantity"/>
+                <field name="volume" sum="Összes térfogat"/>
+            </list>
+        </field>
+    </record>
+    -->
+
+    <!-- Rakat from -->
+    <record id="view_faronk_rakat_form" model="ir.ui.view">
+        <field name="name">lamello.timberstack.form</field>
+        <field name="model">lamello.timberstack</field>
+        <field name="arch" type="xml">
+            <form string="Rakat">
+                <header>
+
+                    <field name="state"
+                            widget="statusbar"
+                            statusbar_visible="draft,approved,received,processing,done,to_manufacture"
+                            invisible="state == 'cancel'"/>
+
+                    <field name="state" 
+                            widget="statusbar"
+                            statusbar_visible="cancel"
+                            invisible="state != 'cancel'"/>
+
+                    <button name="action_approve"
+                            invisible="state != 'draft' or context.get('from_stack_list')"
+                            string="Jóváhagy"
+                            type="object"
+                            class="oe_highlight"
+                            data-hotkey="j"/>
+
+ 
+                    <button name="action_cancel" 
+                            invisible="state != 'approved' or context.get('from_stack_list')" 
+                            string="Érvénytelenít" 
+                            type="object" 
+                            class="oe_highlight"    
+                            data-hotkey="e"/>
+
+                    <button name="action_draft" 
+                            invisible="state != 'cancel' or context.get('from_stack_list')" 
+                            string="Vázlat" 
+                            type="object" 
+                            class="oe_highlight"    
+                            data-hotkey="v"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h2>
+                            Rakat adatai
+                        </h2>
+                        </div>
+                    <group>
+                        <separator string="Alapadatok"/>                    
+                    </group>
+                    <group col="8">
+                        <field name="stack_number" readonly="state not in ['draft']"/>
+                        <field name="timber_location_id" readonly="1"/>
+                        <field name="wood_type_id" readonly="1"/>
+                        <field name="is_purchased" readonly="1"/>
+                        <field name="is_processed" readonly="state not in ['draft'] or is_purchased == False"/>
+                    </group>
+                    <group>
+                        <separator string="Méretek"/>
+                    </group>
+                    <group col="8">
+                        <field name="thickness" readonly="state not in ['draft']"/>
+                        <field name="average_width" readonly="state not in ['draft']"/>
+                        <field name="length" readonly="state not in ['draft']"/>
+                        <field name="quantity" readonly="state not in ['draft']"/>
+                    </group>
+                    <group>
+                        <separator string="Mennyiség"/>                    
+                    </group>
+                    <group>
+                        <field name="total_volume" readonly="1"/>
+                        <field name="received_volume" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+<!--
+
+    <record id="view_faronk_rakat_form_editable" model="ir.ui.view">
+        <field name="name">lamello.timberstack.form.editable</field>
+        <field name="model">lamello.timberstack</field>
+        <field name="arch" type="xml">
+            <form string="Rakat">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,received,processing,done,to_manufacture"/>
+                    <button name="action_approve" invisible="state != 'draft'" string="Jóváhagy" type="object" class="oe_highlight"/>
+                    <button name="action_cancel" invisible="not id or state != 'approved'" string="Érvénytelenít" type="object"/>
+                </header>
+                <sheet>
+                    <group col="8">
+                        <field name="stack_number" readonly="state != 'draft'"/>
+                        <field name="wood_type_id" readonly="1" force_save="1"/>
+                        <field name="is_purchased" readonly="1"/>
+                        <field name="thickness" readonly="state != 'draft'"/>
+                    </group>
+                    <field name="timber_stack_line_ids" readonly="state != 'draft'">
+                        <list editable="bottom">
+                            <field name="length"/>
+                            <field name="width"/>
+                            <field name="quantity"/>
+                            <field name="volume" sum="Összes m3"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_faronk_rakat_form_readonly" model="ir.ui.view">
+        <field name="name">lamello.timberstack.form.readonly</field>
+        <field name="model">lamello.timberstack</field>
+        <field name="arch" type="xml">
+            <form string="Rakat" create="0" edit="0"> 
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,received,processing,done"/>
+                </header>
+                <sheet>
+                    <group col="8">
+                        <field name="stack_number" readonly="1"/>
+                        <field name="timber_location_id" readonly="1"/>
+                        <field name="wood_type_id" readonly="1"/>
+                        <field name="is_purchased" readonly="1"/>
+                    </group>
+                    <field name="timber_stack_line_ids" readonly="1">
+                        <list>
+                            <field name="length"/>
+                            <field name="width"/>
+                            <field name="quantity"/>
+                            <field name="volume" sum="Total"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+-->
+
+    <!-- Rakatjegyzék list -->
+    <record id="view_lamello_timberstack_list_list" model="ir.ui.view">
+        <field name="name">lamello.timberstack.list.list</field>
+        <field name="model">lamello.timberstack.list</field>
+        <field name="arch" type="xml">
+            <list string="Rakatjegyzékek">
+                <field name="name"/>
+                <field name="source_document"/>
+                <field name="open_date"/>
+                <field name="close_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Rakatjegyzék form -->
+    <record id="view_lamello_timberstack_list_form" model="ir.ui.view">
+        <field name="name">lamello.timberstack.list.form</field>
+        <field name="model">lamello.timberstack.list</field>
+        <field name="arch" type="xml">
+            <form string="Rakat jegyzék">
+                <header>
+                    <field name="state" 
+                        widget="statusbar"
+                        statusbar_visible="open, confirmed, closed"
+                        invisible="state == 'cancel'"/>
+                    <field name="state" 
+                        widget="statusbar"
+                        statusbar_visible="cancel"
+                        invisible="state != 'cancel'"/>
+
+                    <button name="action_confirm"
+                        invisible="state != 'open'"
+                        string="Megerősítés"
+                        type="object"
+                        class="oe_highlight"
+                        data-hotkey="v"/>
+                    <button name="action_close"
+                        invisible="state != 'confirmed'"
+                        string="Zárás"
+                        type="object"
+                        class="oe_highlight"
+                        data-hotkey="z"/>
+                    <button name="action_new" 
+                        invisible="state != 'cancel'" 
+                        string="Új létrehozása" 
+                        type="object" 
+                        class="oe_highlight"
+                        data-hotkey="a"/>
+                    <button name="action_cancel"
+                        invisible="state not in ['open', 'confirmed', 'closed']"
+                        string="Érvénytelenít"
+                        type="object"
+                        data-hotkey="e"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label">Rakatjegyzék</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="mb-3"/>
+                    <hr/>
+                    <group>
+                        <field name="source_document" readonly="state != 'open'"/>
+                        <field name="single_erdogazdasag_id" readonly="1"
+                            widget="res_partner_many2one"
+                            invisible="has_multiple_partners or not single_erdogazdasag_id"
+                            string="Beszállító"/>
+                        <field name="erdogazdasag_ids" readonly="1"
+                            invisible="not has_multiple_partners">
+                            <list string="Beszállítók" create="0" delete="0">
+                                <field name="name"/>
+                            </list>
+                        </field>
+                        <field name="wood_type_id" readonly="state != 'open'"/>
+                        <field name="open_date" readonly="state != 'open'"/>
+                        <field name="close_date" readonly="state != 'confirmed'"/>
+                    </group>
+                    <!--
+                    <field name="timber_stack_ids"
+                            readonly="state not in ['open', 'confirmed']"
+                            context="{'form_view_ref': 'lamello_timber.view_faronk_rakat_form', 'default_wood_type_id': wood_type_id}">
+                        <list string="Tételek" limit="200">
+                            <field name="name" width="16%"/>
+                            <field string="Térfogat (m3)" name="total_volume" width="16%"/>
+                            <field name="timber_location_id" width="16%"/>
+                            <field name="state" width="16%"/>
+                        </list>
+                    </field>
+                    -->
+                    <!--
+                    <field name="timber_stack_ids"
+                            readonly="state not in ['open', 'confirmed']"
+                            context="{'default_wood_type_id': wood_type_id, 'from_stack_list': True}"
+                            view_mode="list,form">
+                        <list string="Tételek" limit="200" delete="0">
+                            <field name="name"/>
+                            <field string="Térfogat (m3)" name="total_volume"/>
+                            <field name="timber_location_id"/>
+                            <field name="state"/>
+                            <button name="action_approve" type="object" string="Jóváhagy"
+                                    invisible="state != 'draft'" class="btn-primary btn-sm"/>
+                            <button name="action_cancel" type="object" string="Érvénytelenít"
+                                    invisible="state != 'approved'" class="btn-secondary btn-sm"/>
+                            <button name="action_draft" type="object" string="Vázlat"
+                                    invisible="state != 'cancel'" class="btn-secondary btn-sm"/>
+                            <button name="action_delete" type="object" string=""
+                                    icon="fa-trash" invisible="state != 'cancel'"
+                                    title="Töröl" class="btn-sm text-danger"/>
+                        </list>
+                    </field>
+                    -->
+
+                    <field name="timber_stack_ids"
+                            readonly="state not in ['open', 'confirmed']"
+                            context="{'default_wood_type_id': wood_type_id, 'from_stack_list': True}">
+                        <list string="Tételek" limit="200" delete="0" editable="bottom">
+                            <field name="stack_number" readonly="state != 'draft'" width="130px"/>
+                            <field name="is_processed" readonly="state not in ['draft'] or is_purchased == False" width="50px"/>
+                            <field name="thickness" readonly="state != 'draft'" width="110px"/>
+                            <field name="average_width" readonly="state != 'draft'" width="170px"/>
+                            <field name="length" readonly="state != 'draft'" width="130px"/>
+                            <field name="quantity" readonly="state != 'draft'" width="50px"/>
+                            <field string="Térfogat (m3)" name="total_volume" readonly="1"/>
+                            <field name="timber_location_id" width="180px" readonly="1"/>
+                            <field name="state" width="130px" readonly="1"/>
+                            <button name="action_approve" type="object" string="Jóváhagy"
+                                    invisible="state != 'draft'" class="btn-primary btn-sm"/>
+                            <button name="action_cancel" type="object" string="Érvénytelenít"
+                                    invisible="state != 'approved'" class="btn-secondary btn-sm"/>
+                            <button name="action_draft" type="object" string="Vázlat"
+                                    invisible="state != 'cancel'" class="btn-secondary btn-sm"/>
+                            <button name="action_delete" type="object" string=""
+                                    icon="fa-trash" invisible="state != 'cancel'"
+                                    title="Töröl" class="btn-sm text-danger"/>
+                        </list>
+                    </field>
+                    
+                    <group class="oe_subtotal_footer" colspan="2" style="padding-top: 20px; font-weight: bold; font-size: 20px;">
+                        <field string="Térfogat összesen (m3)" name="total_volume" colspan="2" readonly="1" 
+                            widget="float" options='{"suffix": " m³"}'/>
+                        <field string="Mennyiség összesen (db)" name="total_quantity" colspan="2" readonly="1" 
+                            widget="integer" options='{"suffix": " db"}'/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+    <!-- Rakat mozgatás list -->
+    <record id="view_lamello_timberstack_picking_list" model="ir.ui.view">
+        <field name="name">lamello.timberstack.picking.list</field>
+        <field name="model">lamello.timberstack.picking</field>
+        <field name="arch" type="xml">
+            <list string="Rakatok mozgatása">
+                <field name="picking_type" column_invisible="True"/>
+                <field name="name"/>
+                <field name="source_location_id" column_invisible="context.get('default_picking_type') == 'receipt'"/>
+                <field name="dest_location_id"/>
+                <field name="picking_date"/>
+                <field name="picking_type"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!-- Rakat mozgatás from -->
+    <record id="view_lamello_timberstack_picking_form" model="ir.ui.view">
+        <field name="name">lamello.timberstack.picking.form</field>
+        <field name="model">lamello.timberstack.picking</field>
+        <field name="arch" type="xml">
+            <form string="Rakat mozgatás" edit="0">
+                <header>
+                    <field name="state" 
+                        widget="statusbar"
+                        statusbar_visible="draft,done"
+                        invisible="state == 'cancel'"/>
+                    <field name="state" 
+                        widget="statusbar"
+                        statusbar_visible="cancel"
+                        invisible="state != 'cancel'"/>
+                        
+                    <button name="action_confirm" 
+                        invisible="state != 'draft'" 
+                        string="Jóváhagyás" 
+                        type="object" 
+                        class="oe_highlight"
+                        data-hotkey="j"/>
+                    <button name="action_cancel"
+                        invisible="state in ['cancel', 'draft']" 
+                        string="Érvénytelenít" 
+                        type="object" 
+                        data-hotkey="e"/>
+                    <button name="action_draft" 
+                        invisible="state != 'cancel'" 
+                        string="Vázlat"
+                        type="object" 
+                        class="oe_highlight"
+                        data-hotkey="v"/>
+                </header>
+                <sheet>
+                    <field name="picking_type" invisible="1"/>
+                    <field name="source_location_type" invisible="1"/>
+                    <field name="dest_location_type" invisible="1"/>
+                                            
+                    <div class="oe_title">
+                        <span invisible="picking_type != 'receipt'" class="o_form_label">Rakat átvétel</span>
+                        <span invisible="picking_type != 'internal'" class="o_form_label">Rakat átmozgatás</span>
+                        <span invisible="picking_type != 'dryer-in'" class="o_form_label">Szárítóba be</span>
+                        <span invisible="picking_type != 'dryer-out'" class="o_form_label">Szárítóból ki</span>
+                        <span invisible="picking_type != 'to_manufacture'" class="o_form_label">Gyártásba adás</span>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <div class="mb-3"/>
+                    <hr/>
+                    <group>
+                        <group string="Alapadatok">
+                            <field name="source_location_id" readonly="state != 'draft'" invisible="picking_type != 'internal'" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="source_location_id" readonly="state != 'draft'" invisible="picking_type != 'receipt'" domain="[('location_scope', '=', 'external')]" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="source_location_id" readonly="state != 'draft'" invisible="picking_type != 'dryer-in'" domain="[('location_type', '=', 'store')]" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="source_location_id" readonly="state != 'draft'" invisible="picking_type != 'dryer-out'" domain="[('location_type', '=', 'dryer')]" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="source_location_id" readonly="state != 'draft'" invisible="picking_type != 'to_manufacture'" domain="[('location_scope', '=', 'internal')]" options="{'no_create': True, 'no_quick_create': True}"/>
+
+                            <field name="dest_location_id" required="True" readonly="state != 'draft'" invisible="picking_type != 'internal'" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="dest_location_id" required="True" readonly="state != 'draft'" invisible="picking_type != 'receipt'" domain="[('location_type', '=', 'store')]" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="dest_location_id" required="True" readonly="state != 'draft'" invisible="picking_type != 'dryer-in'" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="dest_location_id" required="True" readonly="state != 'draft'" invisible="picking_type != 'dryer-out'" domain="[('location_type', '=', 'store')]" options="{'no_create': True, 'no_quick_create': True}"/>
+                            <field name="dest_location_id" required="True" readonly="state != 'draft'" invisible="picking_type != 'to_manufacture'" domain="[('to_manufacture', '=', True)]" options="{'no_create': True, 'no_quick_create': True}"/>
+
+                            <field name="delivery_note" readonly="state != 'draft'"/>
+                            <field name="picking_date" readonly="state != 'draft'"/>
+                        </group>
+
+                        <group string="Szárítás/Gőzölés" invisible="dest_location_type != 'dryer' and picking_type != 'dryer-in'">
+                            <field name="processing_type" 
+                                invisible="dest_location_type != 'dryer' and picking_type != 'dryer-in'"
+                                readonly="state != 'draft'"/>
+                            <field name="expected_date" 
+                                invisible="dest_location_type != 'dryer' and picking_type != 'dryer-in'" 
+                                readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <field name="picking_line_ids" readonly="state != 'draft'" invisible="picking_type != 'receipt'">
+                        <list string="Tételek" limit="200" editable="bottom">
+                            <field name="timber_stack_id" 
+                                domain="[('state', 'not in', ['draft', 'cancel']), ('is_received', '=', False)]"
+                                width="25%"/>
+                            <field name="wood_type_id" width="20%" readonly="1"/>
+                            <field name="total_volume" width="20%" readonly="1"/>
+                            <field name="quantity" width="20%"/>
+                        </list>
+                    </field>
+                    <field name="picking_line_ids" readonly="state != 'draft'" invisible="picking_type != 'internal'">
+                        <list string="Tételek" limit="200" editable="bottom">
+                            <field name="timber_stack_id"
+                                domain="[('state', 'not in', ['draft', 'cancel']), ('timber_location_id', '=', parent.source_location_id), ('is_received', '=', True)]"
+                                options="{'no_create': True, 'no_quick_create': True}"
+                                width="25%"/>
+                            <field name="wood_type_id" width="20%" readonly="1"/>
+                            <field name="total_volume" width="20%" readonly="1"/>
+                        </list>
+                    </field>
+                    <field name="picking_line_ids" readonly="state != 'draft'" invisible="picking_type != 'dryer-in'">
+                        <list string="Tételek" limit="200" editable="bottom">
+                            <field name="timber_stack_id"
+                                domain="[('state', 'not in', ['draft', 'cancel']), ('timber_location_id', '=', parent.source_location_id), ('is_received', '=', True)]"
+                                options="{'no_create': True, 'no_quick_create': True}"
+                                width="25%"/>
+                            <field name="wood_type_id" width="20%" readonly="1"/>
+                            <field name="total_volume" width="20%" readonly="1"/>
+                        </list>
+                    </field>
+                    <field name="picking_line_ids" readonly="state != 'draft'" invisible="picking_type != 'dryer-out'">
+                        <list string="Tételek" limit="200" editable="bottom">
+                            <field name="timber_stack_id"
+                                domain="[('state', 'not in', ['draft', 'cancel']), ('timber_location_id', '=', parent.source_location_id), ('is_received', '=', True)]"
+                                options="{'no_create': True, 'no_quick_create': True}"
+                                width="25%"/>
+                            <field name="wood_type_id" width="20%" readonly="1"/>
+                            <field name="total_volume" width="20%" readonly="1"/>
+                        </list>
+                    </field>
+                    <field name="picking_line_ids" readonly="state != 'draft'" invisible="picking_type != 'to_manufacture'">
+                        <list string="Tételek" limit="200" editable="bottom">
+                            <field name="timber_stack_id"
+                                domain="[('state', 'not in', ['draft', 'cancel']), ('timber_location_id.location_scope', '=', 'internal'), ('is_received', '=', True)]"
+                                options="{'no_create': True, 'no_quick_create': True}"
+                                width="25%"/>
+                            <field name="wood_type_id" width="20%" readonly="1"/>
+                            <field name="total_volume" width="20%" readonly="1"/>
+                        </list>
+                    </field>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Rönk és rakat kimutatások -->
+    <!-- search, graph, pivot, list -->
+
+    <record id="view_report_ronk_statisztika_search" model="ir.ui.view">
+    <field name="name">report.ronk.statisztika.search</field>
+    <field name="model">report.ronk.statisztika</field>
+    <field name="arch" type="xml">
+        <search string="Rönkfeldolgozás statisztika szűrés">
+            <field name="name"/>
+            <field name="erdogazdasag_id"/>
+            <field name="faronk_id"/>
+            <separator/>
+            <filter string="Lezárt" name="closed" domain="[('state', '=', 'closed')]"/>
+            <filter string="Megerősített" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+            <separator/>
+            <filter string="Idei szezon" name="this_year" domain="[('purchase_year', '=', context_today().year)]"/>
+            <group>
+                <filter string="Beszállító" name="group_supplier" context="{'group_by':'erdogazdasag_id'}"/>
+                <filter string="Fatípus" name="group_wood" context="{'group_by':'faronk_id'}"/>
+                <filter string="Szezon" name="group_year" context="{'group_by':'purchase_year'}"/>
+                <filter string="Állapot" name="group_state" context="{'group_by':'state'}"/>
+            </group>
+        </search>
+    </field>
+    </record>
+
+    <record id="view_report_ronk_statisztika_list" model="ir.ui.view">
+        <field name="name">report.ronk.statisztika.list</field>
+        <field name="model">report.ronk.statisztika</field>
+        <field name="arch" type="xml">
+            <list string="Kihozatal" create="0" delete="0">
+                <field name="name"/>
+                <field name="erdogazdasag_id"/>
+                <field name="faronk_id"/>
+                <field name="purchase_year"/>
+                
+                <field name="tervezett_m3" />
+                <field name="atvett_m3"/>
+                <field name="feldolgozott_m3"/>
+                <field name="stack_volume"/>
+
+                <field name="processed_percentage"/>
+                <field name="atvett_feldolgozott"/>
+                <field name="stack_received"/>
+                <field name="performance"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_report_ronk_statisztika_pivot" model="ir.ui.view">
+        <field name="name">report.ronk.statisztika.pivot</field>
+        <field name="model">report.ronk.statisztika</field>
+        <field name="arch" type="xml">
+            <pivot string="Rönkfeldolgozás statisztika" display_quantity="false" sample="1">
+                <field name="purchase_year" type="row"/>
+                <field name="erdogazdasag_id" type="row"/>
+                <field name="faronk_id" type="row"/>
+                
+                <field name="tervezett_m3" type="measure"/>
+                <field name="atvett_m3" type="measure"/>
+                <field name="feldolgozott_m3" type="measure"/>
+                <field name="stack_volume" type="measure"/>
+
+                <field name="processed_percentage" type="measure"/>
+                <field name="atvett_feldolgozott" type="measure"/>
+                <field name="stack_received" type="measure"/>
+                <field name="performance" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_report_ronk_statisztika_graph" model="ir.ui.view">
+        <field name="name">report.ronk.statisztika.graph</field>
+        <field name="model">report.ronk.statisztika</field>
+        <field name="arch" type="xml">
+            <graph string="Rönkfeldogozás statisztika" type="bar" sample="1">
+                
+                <field name="erdogazdasag_id"/>
+                <field name="purchase_year"/>
+                <field name="faronk_id"/>
+                
+                <field name="atvett_m3" type="measure"/>
+                <field name="stack_volume" type="measure"/>
+                <field name="performance" type="measure"/>
+                <field name="processed_percentage" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_report_ronk_statisztika" model="ir.actions.act_window">
+        <field name="name">Rönkfeldolgozás statisztika</field>
+        <field name="res_model">report.ronk.statisztika</field>
+        <field name="view_mode">list,pivot,graph</field> <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Nincs még adat a statisztikához.
+            </p>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_form_inherit_hide_picking" model="ir.ui.view">
+        <field name="name">purchase.order.form.hide.picking</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase_stock.purchase_order_view_form_inherit"/>
+        <field name="arch" type="xml">
+            <!-- Először láthatóvá tesszük a segédmezőnket a nézetben (rejtve), hogy használható legyen a feltételben -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="has_timber_log_product" invisible="1"/>
+                <field name="has_timber_stack_product" invisible="1"/>
+            </xpath>
+
+            <!-- Módosítjuk a gombot -->
+            <xpath expr="//button[@name='action_view_picking']" position="attributes">
+                <attribute name="invisible">
+                    has_timber_log_product == True or has_timber_stack_product == True
+                </attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_view_picking']" position="after">
+                <button name="action_timber_log_list" string="Rönkjegyzékek" type="object" class="oe_secondary" data-hotkey="r"
+                    invisible="not has_timber_log_product or state != 'purchase'"/>
+                <button name="action_timber_stack_list" string="Rakatjegyzékek" type="object" class="oe_secondary" data-hotkey="s"
+                    invisible="not has_timber_stack_product or state != 'purchase'"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- actions -->
+    <record model="ir.actions.act_window" id="action_fafajtak">
+        <field name="name">Fatípusok</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.woodtype</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Fatípus létrehozása.
+            </p>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="action_erdogazdasagok">
+        <field name="name">Erdészeti és fűrészáru beszállítók</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{
+            'default_is_forestry_company': True,
+        }</field>
+        <field name="domain">[('is_forestry_company','=',True)]</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Erdészeti/Fűrészáru beszállító létrehozása.
+            </p>
+        </field>
+    </record>
+    
+    <record model="ir.actions.act_window" id="action_timberstack_location">
+        <field name="name">Tárhelyek</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberlocation</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rönk/rakat tárhelyek létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_faronkjegyzek">
+        <field name="name">Rönkjegyzék</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.ronkjegyzek</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rönkjegyzék létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_faronk_atvetel">
+        <field name="name">Rönkátvétel</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.ronkatvetel</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Átvétel létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_faronk_feldolgozas">
+        <field name="name">Rönkfeldolgozás</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.ronkfeldolgozas</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Feldolgozás létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_rakatok">
+        <field name="name">Rakatok</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rakatok listája.
+            </p>
+        </field>
+    </record>
+
+    <!-- action_rakat_tetelek removed: lamello.timberstack.line model no longer exists -->
+
+    <record model="ir.actions.act_window" id="action_timberstack_move">
+        <field name="name">Rakatok mozgatása</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{
+            'default_picking_type': 'internal',
+        }</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rakat mozgatás létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_timberstack_reciept">
+        <field name="name">Rakatok átvétele</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('picking_type', '=', 'receipt')]</field>
+        <field name="context">{
+            'default_picking_type': 'receipt',
+            'default_is_receipt_action': True,
+        }</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rakat átvétel létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_timberstack_dryer_in">
+        <field name="name">Szárítóba be</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('picking_type', '=', 'dryer-in')]</field>
+        <field name="context">{
+            'default_picking_type': 'dryer-in',
+        }</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rakat szárítóba mozgatása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_timberstack_dryer_out">
+        <field name="name">Szárítóból ki</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('picking_type', '=', 'dryer-out')]</field>
+        <field name="context">{
+            'default_picking_type': 'dryer-out',
+        }</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rakat szárítóból kiszedése.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_timberstack_to_manufacture">
+        <field name="name">Gyártásba adás</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('picking_type', '=', 'to_manufacture')]</field>
+        <field name="context">{
+            'default_picking_type': 'to_manufacture',
+        }</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Gyártásba adás létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_timberstack_list">
+        <field name="name">Rakatjegyzék</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lamello.timberstack.list</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Rakatjegyzék létrehozása.
+            </p>
+        </field>
+    </record>
+
+    <!-- Server action a lista binding-hoz -->
+    <record id="server_action_timberstack_move" model="ir.actions.server">
+        <field name="name">Mozgatás</field>
+        <field name="model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['lamello.timberstack.picking'].action_open_from_stacks(records.ids, 'internal')
+        </field>
+    </record>
+
+    <record id="server_action_timberstack_receipt" model="ir.actions.server">
+        <field name="name">Átvétel</field>
+        <field name="model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['lamello.timberstack.picking'].action_open_from_stacks(records.ids, 'receipt')
+        </field>
+    </record>
+
+    <record id="server_action_timberstack_dryer_in" model="ir.actions.server">
+        <field name="name">Szárítóba be</field>
+        <field name="model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['lamello.timberstack.picking'].action_open_from_stacks(records.ids, 'dryer-in')
+        </field>
+    </record>
+
+    <record id="server_action_timberstack_dryer_out" model="ir.actions.server">
+        <field name="name">Szárítóból ki</field>
+        <field name="model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['lamello.timberstack.picking'].action_open_from_stacks(records.ids, 'dryer-out')
+        </field>
+    </record>
+
+    <record id="server_action_timberstack_to_manufacture" model="ir.actions.server">
+        <field name="name">Gyártásba adás</field>
+        <field name="model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_model_id" ref="model_lamello_timberstack"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['lamello.timberstack.picking'].action_open_from_stacks(records.ids, 'to_manufacture')
+        </field>
+    </record>
+
+    <!-- menus -->
+    <menuitem id="faronk_main_menu" 
+        name="Rönkfelvásárlás és feldolgozás" 
+        sequence="999"/>
+
+    <menuitem id="faronk_submenu_beallitasok" 
+        name="Beállítások" 
+        parent="faronk_main_menu" 
+        sequence="8"/>
+
+    <menuitem id="faronk_submenu_fafajtak" 
+        name="Fatípusok" 
+        parent="faronk_submenu_beallitasok" 
+        action="action_fafajtak"
+        sequence="10"/>
+
+    <menuitem id="faronk_submenu_erdogazdasagok" 
+        name="Erdészeti/Fűrészáru beszállító" 
+        parent="faronk_submenu_beallitasok" 
+        action="action_erdogazdasagok"
+        sequence="20"/>
+    
+    <menuitem id="faronk_submenu_locations" 
+        name="Tárhelyek" 
+        parent="faronk_submenu_beallitasok" 
+        action="action_timberstack_location"
+        sequence="30"/>
+    
+    <menuitem id="faronk_submenu_faronkjegyzek" 
+        name="Rönkjegyzék" 
+        parent="faronk_main_menu" 
+        action="action_faronkjegyzek"
+        sequence="1"/>
+
+    <menuitem id="faronk_submenu_ronk_muveletek" 
+        name="Rönk műveletek" 
+        parent="faronk_main_menu" 
+        sequence="2"/>
+
+    <menuitem id="faronk_submenu_ronkatvetel" 
+        name="Rönk telephelyi átvétele" 
+        parent="faronk_submenu_ronk_muveletek" 
+        action="action_faronk_atvetel" 
+        sequence="10"/>
+
+    <menuitem id="faronk_submenu_ronkefeldolgozas" 
+        name="Rönfeldolgozás" 
+        parent="faronk_submenu_ronk_muveletek" 
+        action="action_faronk_feldolgozas" 
+        sequence="20"/>
+
+    <menuitem id="faronk_submenu_rakatok" 
+        name="Rakatok" 
+        parent="faronk_main_menu" 
+        action="action_rakatok" 
+        sequence="3"/>
+
+    <menuitem id="faronk_submenu_rakatjegyzek" 
+        name="Rakatjegyzék" 
+        parent="faronk_main_menu" 
+        action="action_timberstack_list" 
+        sequence="4"/>
+
+    <menuitem id="faronk_submenu_rakat_muveletek" 
+        name="Rakat műveletek" 
+        parent="faronk_main_menu" 
+        sequence="5"/>
+
+    <menuitem id="faronk_submenu_rakatok_mozgatasa" 
+        name="Rakatok mozgatása" 
+        parent="faronk_submenu_rakat_muveletek" 
+        action="action_timberstack_move"
+        sequence="10"/>
+
+    <menuitem id="faronk_submenu_rakatok_bevetelezese" 
+        name="Rakatok átvétele" 
+        parent="faronk_submenu_rakat_muveletek" 
+        action="action_timberstack_reciept" 
+        sequence="20"/>
+
+    <menuitem id="faronk_submenu_rakatok_dryer_in" 
+        name="Szárítóba be" 
+        parent="faronk_submenu_rakat_muveletek" 
+        action="action_timberstack_dryer_in"
+        sequence="30"/>
+
+    <menuitem id="faronk_submenu_rakatok_dryer_out"
+        name="Szárítóból ki"
+        parent="faronk_submenu_rakat_muveletek"
+        action="action_timberstack_dryer_out"
+        sequence="40"/>
+
+    <menuitem id="faronk_submenu_rakatok_to_manufacture"
+        name="Gyártásba adás"
+        parent="faronk_submenu_rakat_muveletek"
+        action="action_timberstack_to_manufacture"
+        sequence="50"/>
+
+    <menuitem id="menu_report_ronk_statisztika" 
+          name="Rönk és rakat kimutatások" 
+          parent="faronk_main_menu" 
+          action="action_report_ronk_statisztika" 
+          sequence="7"/>
+
+  </data>
+</odoo>

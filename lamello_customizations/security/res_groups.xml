@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Group: Bejövő számla engedélyezés -->
+        <record id="group_incoming_invoice_approval" model="res.groups">
+            <field name="name">Bejővő száml engedélyezés</field>
+            <field name="comment">Lehetővé teszi a bejövő számlák (szállítói számlák) engedélyezését.</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_lamello_customizations_lamello_productfamily,lamello_customizations.lamello_productfamily,model_lamello_productfamily,base.group_user,1,1,1,1
+access_lamello_customizations_lamello_batch,lamello_customizations.lamello_batch,model_lamello_batch,base.group_user,1,1,1,1
+access_lamello_batch_mo_wizard,lamello.batch.mo.wizard,model_lamello_batch_mo_wizard,base.group_user,1,1,1,1
+access_lamello_batch_report_wizard,lamello.batch.report.wizard,model_lamello_batch_report_wizard,base.group_user,1,1,1,1
+access_account_move_invoice_approval,account.move invoice approval,account.model_account_move,lamello_customizations.group_incoming_invoice_approval,1,1,0,0
+access_mrp_component_group,mrp.component.group,model_mrp_component_group,base.group_user,1,1,1,1
+access_mrp_component_group_keyword,mrp.component.group.keyword,model_mrp_component_group_keyword,base.group_user,1,1,1,1
+access_mrp_component_group_code,mrp.component.group.code,model_mrp_component_group_code,base.group_user,1,1,1,1

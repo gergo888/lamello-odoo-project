@@ -1,0 +1,10 @@
+<odoo>
+    <record id="seq_lamello_batch" model="ir.sequence">
+        <field name="name">Ütem Szekvencia</field>
+        <field name="code">lamello.batch</field>
+        <field name="prefix">Ütem-</field>
+        <field name="padding">4</field>
+        <field name="number_increment">1</field>
+        <field name="implementation">standard</field>
+    </record>
+</odoo>

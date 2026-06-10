@@ -1,0 +1,894 @@
+<odoo>
+  <data>
+
+    <!-- sale.order -->
+    <record model="ir.ui.view" id="lamello_sale_order_form">
+      <field name="name">lamello.sale.order.form</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='commitment_date']" position="replace">
+          <field name="commitment_date" invisible="1"/>
+        </xpath>
+        <field name="date_order" position="after">
+          <!--
+          <field name="delivery_year" readonly="state != 'draft'"/>
+          -->
+          <field name="client_order_ref"/>
+          <field name="type"/>
+          <field name="product_families" widget="many2many_tags"/>
+          <field name="delivery_year"/>
+          <field name="delivery_week"/>
+          <field name="sale_order_group_by_week_and_partner"/>
+          <field name="commitment_date"/>          
+        </field>
+        
+        <xpath expr="//field[@name='order_line']/list//field[@name='qty_invoiced']" position="after">
+            <field name="parcel_qty"/>
+        </xpath>
+        
+        <xpath expr="//field[@name='order_line']//list//field[@name='tax_ids']" position="attributes">
+            <attribute name="width">40px</attribute>
+        </xpath>
+
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="lamello_sale_order_tree">
+      <field name="name">lamello.sale.order.tree</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.sale_order_tree"/>
+      <field name="arch" type="xml">
+        <field name="activity_ids" position="after">
+          <field name="delivery_year"/>
+          <field name="delivery_week"/>
+          <field name="product_families" widget="many2many_tags"/>
+        </field>
+        <field name="company_id" position="after">
+          <field name="type"/>
+          <field name="client_order_ref"/>
+          <field name="batch_id" widget="many2many_tags"/>
+        </field>
+      </field>
+    </record>
+
+    <record id="lamello_view_sales_order_filter" model="ir.ui.view">
+      <field name="name">lamello.sale.order.filter</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+      <field name="arch" type="xml">
+        <filter name="my_sale_orders_filter" position="before">
+          <filter name="filter_domestic" string="Hazai" domain="[('type', '=', 'domestic')]" help="Hazai rendelések"/>
+          <filter name="filter_export" string="Export" domain="[('type', '=', 'export')]" help="Export rendelések"/>
+        </filter>
+      </field>
+    </record>
+
+
+    <!-- stock.picking -->
+    <record model="ir.ui.view" id="lamello_stock_picking_form">
+      <field name="name">lamello.picking.form</field>
+      <field name="model">stock.picking</field>
+      <field name="inherit_id" ref="stock.view_picking_form"/>
+      <field name="arch" type="xml">
+        <!--
+        <xpath expr="//button[@name='%(stock.action_report_delivery)d']" position="attributes">
+            <attribute name="invisible">state == 'done' and picking_type_code == 'outgoing'</attribute>
+        </xpath>
+        -->
+
+        <xpath expr="//button[@name='%(stock.action_report_delivery)d']" position="after">
+        <!--
+            <button name="action_print_delivery_slip" 
+                    string="Print" 
+                    invisible="state != 'done' or picking_type_code != 'outgoing'" 
+                    type="object" 
+                    groups="base.group_user" 
+                    data-hotkey="o"/>
+                    -->
+            <button name="action_custom_create_invoice" 
+                    string="Számla létrehozása" 
+                    type="object" 
+                    class="oe_highlight" 
+                    invisible="picking_type_code != 'outgoing' or state != 'done' or invoiced"
+                    groups="base.group_user" 
+                    confirm="Biztosan létre szeretnéd hozni a számlát a kiszállított mennyiségek alapján?"/>
+        </xpath>
+        
+        <field name="origin" position="after">
+          <field name="batch_id" readonly="1" invisible="picking_type_code != 'internal'"/>
+          <field name="delivery_year" invisible="picking_type_code != 'outgoing'"/>
+          <field name="delivery_week" invisible="picking_type_code != 'outgoing'"/>
+          <field name="type" invisible="picking_type_code != 'outgoing'"/>
+        </field>
+<!--
+        <xpath expr="//sheet/group/group[2]" position="after">
+          <group name="szallito_beallitasok" string="Szállítólevél beállítások" invisible="state != 'done' and picking_type_code != 'outgoing'">
+            <field name="delivery_slip_type"/>
+          </group>
+        </xpath>
+    -->    
+        <xpath expr="//field[@name='picking_properties']" position="before">
+          <group name="szallito_beallitasok" string="Szállítólevél beállítások" invisible="state != 'done' and picking_type_code != 'outgoing'">
+            <field name="delivery_slip_type"/>
+          </group>
+        </xpath>
+
+        <xpath expr="//field[@name='move_ids']//field[@name='quantity']" position="before">
+          <field name="parcel_qty" column_invisible="parent.picking_type_code != 'outgoing'"/>
+        </xpath>
+      </field>
+
+    </record>
+  
+  <!--
+    <record id="view_picking_tree_batch_only_pc_sfp" model="ir.ui.view">
+        <field name="name">stock.picking.tree.batch.pc.sfp</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+
+
+  
+        <xpath expr="//field[@name='origin']" position="after">
+            <field name="batch_id"
+                   readonly="1"
+                   optional="show"/>
+        </xpath>
+
+        </field>
+    </record>
+    -->
+
+    <!-- egyedi internal list view -->
+    <record model="ir.ui.view" id="lamello_stock_picking_tree_internal">
+        <field name="name">lamello.picking.tree.internal</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="mode">primary</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <field name="origin" position="after">
+                <field name="batch_id"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- egyedi internal list megnyitása, felső link -->
+    <record id="action_lamello_picking_tree_internal" model="ir.actions.act_window">
+        <field name="name">Internal Transfers</field>
+        <field name="res_model">stock.picking</field>
+        <field name="path">internal-transfers-custom</field>
+        <field name="view_mode">list,kanban,form,calendar,activity</field>
+        <field name="domain"></field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_internal')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
+    </record>
+
+    <!-- egyedi internal list megnyitása, ready gomb -->
+    <record id="action_lamello_picking_tree_ready_internal" model="ir.actions.act_window">
+        <field name="name">To Do</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,kanban,form,calendar</field>
+        <field name="domain"></field>
+        <field name="context">{'contact_display': 'partner_address', 'search_default_available': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_internal')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
+    </record>
+
+    <!-- egyedi outgoing list -->
+    <record model="ir.ui.view" id="lamello_stock_picking_tree_to_invoice">
+        <field name="name">lamello.picking.tree.custom</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="mode">primary</field> 
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <field name="origin" position="after">
+                <field name="delivery_year"/>
+                <field name="delivery_week"/>
+                <field name="invoiced"/>
+                <field name="type"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_picking_to_invoice" model="ir.actions.act_window">
+        <field name="name">Számlázandó</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('picking_type_code', '=', 'outgoing'), ('type', '=', 'export'), ('invoiced', '=', 'false')]</field>
+        <field name="context">{"create": False}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+          (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
+          (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
+    </record>
+
+    <!-- egyedi outgoing list megnyitása, szűrővel a from értelmetlennek tűnik -->
+    <record id="action_lamello_picking_tree_ready" model="ir.actions.act_window">
+            <field name="name">To Do</field>
+            <field name="res_model">stock.picking</field>
+            <field name="view_mode">list,kanban,form,calendar</field>
+            <field name="domain"></field>
+            <field name="context">{'contact_display': 'partner_address', 'search_default_available': 1}</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
+    </record>
+
+    <!-- egyedi outgoing list megnyitása, a from értelmetlennek tűnik -->
+    <record id="action_lamello_picking_tree_outgoing" model="ir.actions.act_window">
+            <field name="name">Deliveries</field>
+            <field name="res_model">stock.picking</field>
+            <field name="path">deliveries-weeks</field>
+            <field name="view_mode">list,kanban,form,calendar,activity</field>
+            <field name="domain"></field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
+    </record>
+
+    <menuitem id="menu_picking_to_invoice"
+          name="Számlázandó"
+          parent="stock.menu_stock_root"
+          action="action_picking_to_invoice"
+          sequence="150"/>
+
+    <!-- product.template -->
+    <record model="ir.ui.view" id="lamello_product_template_form">
+      <field name="name">lamello.product.template.form</field>
+      <field name="model">product.template</field>
+      <field name="inherit_id" ref="product.product_template_form_view"/>
+      <field name="arch" type="xml">
+        <field name="categ_id" position="after">
+
+          <field name="invoice_name"/>
+          <field name="parcel_qty"/>
+          <field name="component_code"/>
+          <field name="product_codes" readonly="1"/>
+          <field name="product_family_id"/>
+          <field name="dimensions" readonly="1" invisible="product_variant_count != 1"/>
+        </field>
+      </field>
+    </record>
+
+    <!-- product.product -->
+    <record model="ir.ui.view" id="lamello_product_product_form">
+      <field name="name">lamello.product.product.form</field>
+      <field name="model">product.product</field>
+      <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='image_1920']" position="replace">
+            <field name="image_variant_1920" 
+                   widget="image" 
+                   class="oe_avatar" 
+                   options="{'zoom': True, 'convert_to_webp': True, 'preview_image': 'image_variant_128'}"/>
+        </xpath>
+
+        <field name="default_code" position="after">
+
+          <field name="invoice_name"/>
+
+          <field name="component_code"/>
+          <field name="product_codes" readonly="1"/>        
+          <!--
+          <field name="seller_ids" widget="many2many_tags"/>          
+          -->  
+        </field>
+
+        <xpath expr="//group[@name='weight']//div[field[@name='weight']]" position="after">
+            <label for="parcel_qty"/>
+            <div class="d-flex">
+                <field name="parcel_qty" class="oe_inline"/>
+            </div>
+        </xpath>
+        <xpath expr="//sheet/group[last()]" position="after">
+          <separator string="Belső jegyzetek"/>
+          <field name="description" placeholder="Írja ide a belső megjegyzéseket..." class="oe_inline"/>
+        </xpath>
+      </field>
+    </record>
+
+
+    <record id="product_product_kanban_view_inherit_codes" model="ir.ui.view">
+        <field name="name">product.product.kanban.inherit.codes</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='color']" position="after">
+                <field name="product_codes"/>
+            </xpath>
+
+            <xpath expr="//span[@t-if='record.default_code.value']" position="after">
+                <div t-if="record.product_codes.raw_value" class="text-muted small italic">
+                    <i class="fa fa-tags" title="Beszállítói termékkódok"/> 
+                    <field name="product_codes"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="lamello_product_product_list">
+      <field name="name">lamello.product.product.list</field>
+      <field name="model">product.product</field>
+      <field name="inherit_id" ref="product.product_product_tree_view"/>
+      <field name="arch" type="xml">
+        <field name="name" position="after">
+          <field name="dimensions" optional="show"/>
+          <field name="product_codes" optional="show" readonly="1"/>
+          <!--
+          <field name="seller_ids" widget="many2many_tags"/>
+          -->
+        </field>
+      </field>
+    </record>
+
+    
+
+    <!-- mrp.production -->
+    <record model="ir.ui.view" id="lamello_mrp_production_form">
+      <field name="name">lamello.mrp.production.form</field>
+      <field name="model">mrp.production</field>
+      <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+      <field name="arch" type="xml">
+        <field name="user_id" position="after">
+          <field name="batch_id"/>
+        </field>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="lamello_mrp_production_list">
+      <field name="name">lamello.mrp.production.list</field>
+      <field name="model">mrp.production</field>
+      <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+      <field name="arch" type="xml">
+        <field name="components_availability" position="after">
+          <field name="batch_id"/>
+        </field>
+      </field>
+    </record>
+
+    <!-- mrp.bom.line -->
+    <odoo>
+    <record id="mrp_bom_form_view_inherit_dimensions" model="ir.ui.view">
+        <field name="name">mrp.bom.form.view.inherit.dimensions</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[@name='product_id']" position="after">
+                <field name="dimensions" readonly="1"/>
+                <field name="component_code"/>
+            </xpath>
+        </field>
+        </record>
+    </odoo>
+
+    <!-- 2. commit -->
+    <!-- invoice approval disabled - deactivate stale DB records -->
+    
+    <!--
+    <record id="view_move_form_invoice_approval" model="ir.ui.view">
+      <field name="active">False</field>
+    </record>
+    <record id="view_move_list_invoice_approval" model="ir.ui.view">
+      <field name="active">False</field>
+    </record>
+    -->
+
+    <!-- account.move -->
+
+    <record model="ir.ui.view" id="lamello_account_move_form">
+      <field name="name">lamello.account.move.form</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//group[group[@id='header_left_group']]" position="after">
+            <group name="szamlazz_beallitasok" string="Számlázási beállítások" invisible="move_type != 'out_invoice'">
+                <field name="account_template_type"/>
+            </group>          
+        </xpath>
+      </field>
+    </record>
+  
+
+    <!-- res.company -->
+    <record id="view_company_form_inherit_vat" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.vat</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="international_vat" placeholder="pl. HU12345678"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- lamello.product.family -->
+<!--
+    <record id="lamello_productfamily_form_view" model="ir.ui.view">
+        <field name="name">lamello.productfamily.form</field>
+        <field name="model">lamello.productfamily</field>
+        <field name="arch" type="xml">
+            <form string="Termékcsalád">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="alternative_name"/>
+                        <field name="product_category_ids"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+-->
+
+    <record model="ir.actions.act_window" id="action_product_families">
+    <field name="name">Termékcsaládok</field>
+    <field name="res_model">lamello.productfamily</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="oe_view_nocontent_create">
+          Termékcsalád létrehozása.
+      </p>
+    </field>
+  </record>
+
+  <menuitem id="lamello_menu_productfamilies" 
+    parent="sale.sale_menu_root"
+    action="action_product_families"
+    name="Termékcsaládok" 
+    sequence="100"/>
+
+
+  <!-- sale.order hazai/export -->
+  <record id="lamello_action_quotations_domestic" model="ir.actions.act_window">
+    <field name="name">Hazai árajánlatok</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+    <field name="search_view_id" ref="lamello_view_sales_order_filter"/>
+    <field name="context">{'default_type': 'domestic', 'search_default_filter_domestic': 1}</field>
+    <field name="path">domestic-quotations</field>
+  </record>
+   
+  <record id="lamello_action_quotations_export" model="ir.actions.act_window">
+    <field name="name">Export árajánlatok</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+    <field name="search_view_id" ref="lamello_view_sales_order_filter"/>
+    <field name="context">{'default_type': 'export', 'search_default_filter_export': 1}</field>
+    <field name="path">export-quotations</field>
+  </record>   
+
+  <record id="lamello_action_orders_domestic" model="ir.actions.act_window">
+    <field name="name">Hazai rendelések</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+    <field name="search_view_id" ref="lamello_view_sales_order_filter"/>
+    <field name="context">{
+      'search_default_sales' : 1,     
+      'default_type': 'domestic', 
+      'search_default_filter_domestic': 1
+    }</field>
+    <field name="path">domestic-orders</field>
+  </record>
+    
+  <record id="lamello_action_orders_export" model="ir.actions.act_window">
+    <field name="name">Export rendelések</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+    <field name="search_view_id" ref="lamello_view_sales_order_filter"/>
+    <field name="context">{
+      'search_default_sales' : 1,     
+      'default_type': 'export', 
+      'search_default_filter_export': 1
+    }</field>
+    <field name="path">export-orders</field>
+  </record>    
+
+  <menuitem id="lamello_menu_domestic_quotations" 
+    parent="sale.sale_order_menu"
+    action="lamello_action_quotations_domestic"
+    name="Hazai árajánlatok" 
+    sequence="11"/>
+
+  <menuitem id="lamello_menu_export_quotations" 
+    parent="sale.sale_order_menu"
+    action="lamello_action_quotations_export"
+    name="Export árajánlatok" 
+    sequence="12"/>
+
+  <menuitem id="lamello_menu_domestic_orders" 
+    parent="sale.sale_order_menu"
+    action="lamello_action_orders_domestic"
+    name="Hazai rendelések" 
+    sequence="21"/>
+
+  <menuitem id="lamello_menu_export_orders" 
+    parent="sale.sale_order_menu"
+    action="lamello_action_orders_export"
+    name="Export rendelések" 
+    sequence="22"/>
+
+  <!-- lamello.batch -->
+  <record model="ir.ui.view" id="lamello_batch_form">
+      <field name="name">lamello.batch.form</field>
+      <field name="model">lamello.batch</field>
+      <field name="arch" type="xml">
+        <form string="Ütem">
+          <header>
+            <button name="action_open_mo_wizard" string="Gyártási megrendelések létrehozása rendelési tételek alapján" type="object" class="btn-primary"/>
+            <button name="action_confirm_parent_mo" string="Értékesíthető termékek megerősítése" type="object" class="btn-secondary"/>
+            <button name="action_confirm_components" string="Alkatrészek megerősítése" type="object" class="btn-secondary"/>
+            <button name="action_manufacture_and_store_components" string="Alkatrészek gyártása és tárolása" type="object" class="btn-secondary"/>
+            <!--
+            <button name="action_store_components" string="Alkatrészek tárolása" type="object" class="btn-secondary"/>
+            -->
+          </header>
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" readonly="True"/>
+              </h1>
+            </div>
+            <group>
+              <field name="delivery_year"/>
+              <field name="delivery_week"/>
+              <field name="number"/>
+              <field name="color"/>
+              <field name="product_family_id"/>
+            </group>
+            <notebook>
+              
+              <page string="Értékesíthető termékek" name="sale_orders">
+                  <field name="sale_mo_ids" widget="many2many" context="{'default_batch_id': id}">
+                      <list editable="bottom">
+                          <field name="name" readonly="1"/>
+                          <field name="product_id" domain="[('sale_ok', '=', True)]" readonly="1"/>
+                          <field name="product_qty" readonly="1"/>
+                          <field name="state" string="Állapot" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'" readonly="1"/>
+                          <field name="is_filtered_pick" string="Raktári kiadás csoportosítása"/>
+                          <button name="action_open_form" type="object" icon="fa-external-link" title="Megnyitás"/>
+                      </list>
+                  </field>
+              </page>
+
+              <page string="Félkész termékek / Alkatrészek" name="non_sale_orders">
+                  <field name="non_sale_mo_ids" widget="many2many" context="{'default_batch_id': id}">
+                      <list>
+                          <field name="name"/>
+                          <field name="product_id" domain="[('sale_ok', '=', False)]"/>
+                          <field name="product_qty"/>
+                          <field name="state" string="Állapot" widget="badge"/>
+                      </list>
+                  </field>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+  </record>
+
+  <record model="ir.ui.view" id="lamello_batch_list">
+    <field name="name">lamello.batch.list</field>
+    <field name="model">lamello.batch</field>
+    <field name="arch" type="xml">
+      <list string="Ütemek">
+        <field name="name" width="20%"/>
+        <field name="delivery_year" width="16%"/>
+        <field name="delivery_week" width="16%"/>
+        <field name="number" width="16%"/>
+        <field name="color" width="16%"/>
+        <field name="product_family_id" width="16%"/>
+      </list>
+    </field>
+  </record>
+
+      <record id="view_sale_order_line_simplified_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.simplified.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty"/>
+                <!--
+                <field name="product_size_x"/>
+                <field name="product_size_y"/>
+                <field name="product_size_z"/>
+                -->
+                <field name="product_template_attribute_value_ids" 
+                   widget="many2many_tags" 
+                   string="Attribútumok"/>
+            </list>
+        </field>
+    </record>
+
+  <!-- csoportok -->
+  <record id="view_mrp_component_group_tree" model="ir.ui.view">
+          <field name="name">mrp.component.group.tree</field>
+          <field name="model">mrp.component.group</field>
+          <field name="arch" type="xml">
+              <list>
+                  <field name="sequence" widget="handle"/>
+                  <field name="name"/>
+              </list>
+          </field>
+      </record>
+
+      <record id="view_mrp_component_group_form" model="ir.ui.view">
+          <field name="name">mrp.component.group.form</field>
+          <field name="model">mrp.component.group</field>
+          <field name="arch" type="xml">
+              <form>
+                  <sheet>
+                      <!-- Fejléc adatok -->
+                      <div class="oe_title">
+                          <label for="name" string="Csoport neve"/>
+                          <h1>
+                              <field name="name" placeholder="Pl. Fenekek"/>
+                          </h1>
+                      </div>
+
+                      <!-- Itt kezdődik a fülezés -->
+                      <notebook>
+                          <page string="Alkatrészkódok" name="codes">
+                              <field name="code_ids">
+                                  <list editable="bottom">
+                                      <field name="name" string="Kód"/>
+                                  </list>
+                              </field>
+                          </page>
+                          <page string="Kulcsszavak (Név alapján)" name="keywords">
+                              <field name="keyword_ids">
+                                  <list editable="bottom">
+                                      <field name="name" string="Kulcsszó"/>
+                                  </list>
+                              </field>
+                          </page>
+                      </notebook>
+                  </sheet>
+              </form>
+          </field>
+      </record>
+
+      <record id="action_mrp_component_group" model="ir.actions.act_window">
+          <field name="name">Alkatrész csoportok</field>
+          <field name="res_model">mrp.component.group</field>
+          <field name="view_mode">list,form</field>
+      </record>
+
+
+    <!-- Wizard Form View -->
+    <record id="view_lamello_batch_mo_wizard_form" model="ir.ui.view">
+        <field name="name">lamello.batch.mo.wizard.form</field>
+        <field name="model">lamello.batch.mo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Gyártási megrendelések létrehozása rendelések alapján">
+                <field name="batch_id" invisible="1"/>
+                <group>
+                    <field name="batch_id" readonly="1" string="Ütem"/>
+                </group>
+                <separator string="Megrendelés tételek"/>
+                
+                <field name="delivery_year" invisible="1"/>
+                <field name="delivery_week" invisible="1"/>
+                <field name="product_family_id" invisible="1"/>
+                <field name="color" invisible="1"/>
+
+                <field name="sale_order_line_ids"
+                   widget="many2many"
+                   domain="[
+                        ('order_id.state', 'in', ['sale', 'done']),
+                        ('product_id.type', '=', 'consu'),
+                        ('order_id.delivery_year', '=', delivery_year),
+                        ('order_id.delivery_week', '=', delivery_week),
+                        ('batch_id', '=', False),
+                        ('order_id.has_manufacturing_order', '=', False),
+                        ('product_id.sale_ok', '=', True),
+                        ('product_id.product_tmpl_id.purchase_ok', '=', False)
+                   ] + ([('product_id.product_tmpl_id.product_family_id', '=', product_family_id)] if product_family_id else [])"
+                   context="{
+                    'tree_view_ref': 'view_sale_order_line_simplified_tree',
+                    'dialog_size': 'extra-large'
+                    }">
+                    <list>
+                        <field name="order_id" string="Rendelés"/>
+                        <field name="product_id" string="Termék"/>
+                        <field name="product_uom_qty" string="Mennyiség"/>
+                        <field name="product_uom_id" string="Egység"/>
+                        <field name="state" string="Állapot"/>
+                    </list>
+                </field>
+                <footer>
+                    <button
+                        name="action_create_manufacturing_orders"
+                        string="Létrehozás"
+                        type="object"
+                        class="btn-primary"
+                    />
+                    <button string="Mégse" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Internal picking search: Kiadandó filter -->
+    <record id="lamello_picking_internal_search" model="ir.ui.view">
+      <field name="name">lamello.stock.picking.internal.search</field>
+      <field name="model">stock.picking</field>
+      <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+      <field name="arch" type="xml">
+        <filter name="available" position="after">
+          <separator/>
+          <filter name="kiadando" string="Kiadandó"
+                  domain="[('move_ids.product_id.purchase_ok', '=', True), ('state', 'not in', ('done', 'cancel'))]"
+                  help="Vásárolt termékeket tartalmazó szállítmányok"/>
+        </filter>
+      </field>
+    </record>
+
+    <!-- MRP search -->
+    <record id="lamello_mrp_filter" model="ir.ui.view">
+      <field name="name">lamello.mrp.filter</field>
+      <field name="model">mrp.production</field>
+      <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+      <field name="arch" type="xml">
+        <filter name="filter_to_close" position="after">
+          <filter name="filter_sale" string="Késztermékek" domain="[('product_id.sale_ok', '=', True)]" help="Eladható termékek"/>
+          <filter name="filter_not_sale" string="Félkész termékek" domain="[('product_id.sale_ok', '=', False)]" help="Nem eladható termékek"/>
+        </filter>
+      </field>
+    </record>
+
+<!--
+    <record id="res_users_preferences_form_narrow_chatter" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.narrow.chatter</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+          <xpath expr="//page[@name='preferences_page']//div[contains(@class,'o_row')][field[@name='lang']]" position="after">
+              <field name="narrow_chatter" widget="boolean_toggle"/>
+          </xpath>
+        </field>
+    </record>
+-->
+
+    <!-- Server Action / Window Action for the wizard -->
+    <record id="action_lamello_batch_mo_wizard" model="ir.actions.act_window">
+        <field name="name">Gyártási megrendelések létrehozása</field>
+        <field name="res_model">lamello.batch.mo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_lamello_batch_mo_wizard_form"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_lamello_batch"/>
+        <field name="context">{'default_batch_id': active_id}</field>
+    </record>
+
+
+  <!-- Actions -->
+  <record model="ir.actions.act_window" id="action_batches">
+    <field name="name">Ütemek</field>
+    <field name="res_model">lamello.batch</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="oe_view_nocontent_create">
+          Ütem létrehozása.
+      </p>
+    </field>
+  </record>
+
+  
+
+
+  <!-- alkatrész listák -->
+  <!--
+  <record id="action_mo_report_nav" model="ir.actions.server">
+      <field name="name">Összes MO riport nyomtatása</field>
+      <field name="model_id" ref="mrp.model_mrp_production"/>
+      <field name="binding_model_id" ref="mrp.model_mrp_production"/>
+      <field name="state">code</field>
+      <field name="code">
+          action = env.ref('lamello_customizations.action_report_mo_all_components').report_action(env['mrp.production'].search([]))
+      </field>
+  </record>
+
+  <menuitem id="menu_mrp_mo_component_report"
+            name="MO Komponens Lista"
+            parent="mrp.menu_mrp_reporting"
+            action="action_mo_report_nav"
+            sequence="100"/>
+
+-->
+      <!-- alaktrészlista wizard-->
+
+      <record id="view_lamello_batch_report_wizard_form" model="ir.ui.view">
+        <field name="name">lamello.batch.report.wizard.form</field>
+        <field name="model">lamello.batch.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+
+                <group>
+                  <field name="batch_id"/>
+                  <field name="delivery_year"/>
+                  <field name="delivery_week"/>
+                </group>
+
+                <separator/>
+                <group name="report_settings">
+                    <field name="report_type" widget="radio"/>
+                </group>
+
+                <footer>
+                    <button name="action_print" string="Nyomtatás" type="object" class="btn-primary"/>
+                    <button string="Mégse" class="btn-secondary" special="cancel"/>
+                </footer>
+
+                
+
+            </form>
+        </field>
+    </record>
+
+    <record id="action_lamello_batch_report_wizard" model="ir.actions.act_window">
+        <field name="name">Nyomtatás</field>
+        <field name="res_model">lamello.batch.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+<!--
+    <menuitem id="menu_lamello_batch_report" 
+              name="Ütem riportok" 
+              parent="mrp.menu_mrp_reporting" 
+              action="action_lamello_batch_report_wizard"/>
+-->
+
+<!-- Menu Items -->
+
+  <menuitem id="lamello_menu_batches_weekly" 
+    parent="mrp.menu_mrp_root"
+    name="Gyártás heti ütemezése" 
+    sequence="99"/>
+
+  <menuitem id="lamello_menu_batches" 
+    parent="lamello_menu_batches_weekly"
+    action="action_batches"
+    name="Ütemek" 
+    sequence="1"/>
+
+  <menuitem id="lamello_menu_batches_wizard" 
+    parent="lamello_menu_batches_weekly"
+    action="action_lamello_batch_report_wizard"
+    name="Listák" 
+    sequence="2"/>
+
+
+  <!-- Menüpont a Gyártás / Konfiguráció alatt -->
+  <menuitem id="menu_mrp_component_group"
+            name="Alkatrész csoportok"
+            parent="lamello_menu_batches_weekly"
+            action="action_mrp_component_group"
+            sequence="100"/>
+
+
+    <!-- Replenishment report: custom "Buy" route filter -->
+    <record id="lamello_stock_reorder_report_search_inherit" model="ir.ui.view">
+        <field name="name">stock.warehouse.orderpoint.reorder.search.lamello</field>
+        <field name="model">stock.warehouse.orderpoint</field>
+        <field name="inherit_id" ref="stock.stock_reorder_report_search"/>
+        <field name="arch" type="xml">
+            <filter name="filter_not_snoozed" position="after">
+                <separator/>
+                <filter string="Beszerzés" name="filter_route_buy"
+                        domain="['|', ('route_id.rule_ids.action', '=', 'buy'), ('product_tmpl_id.purchase_ok', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
+
+  </data>
+</odoo>

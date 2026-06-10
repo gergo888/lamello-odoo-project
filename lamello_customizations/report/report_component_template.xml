@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<!-- Alkatrészlista -->
+<template id="report_component_template">
+    <t t-call="web.basic_layout">
+        <div class="page" style="font-family: sans-serif; font-size: 13px;">
+            <t t-foreach="batches" t-as="batch">
+            <t t-foreach="batch['groups'].items()" t-as="group">
+                <t t-if="group[1]"> 
+                    
+                    <div t-att-style="'page-break-before: always;'">
+                        
+                        <div class="row mb-4 text-center" style="border-bottom: 2px solid black;">
+                            <div class="col-12">
+                                <p style="font-size: 30px; font-weight: bold; margin-bottom: 5px;">
+                                    <t t-esc="batch.get('family', '').upper()"/>   KW-<t t-esc="batch.get('week')"/>-s szállítás
+                                </p>
+                                <p style="font-size: 20px; font-style: italic; font-weight: bold; margin-top: 0px; margin-bottom: 10px;">
+                                    <t t-esc="batch.get('number')"/>. ütem<span t-if="batch.get('color')">, (<t t-esc="batch.get('color')"/>)</span>, <t t-esc="group[0]"/>
+                                </p>
+                            </div>
+                        </div>
+
+                        <table style="border-color: white !important; width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <tbody>
+                                <t t-foreach="batch.get('sale_mo_ids')" t-as="mo">
+                                    <tr style="font-size: 16px;">
+                                        <td style="padding: 4px; width: 80%;"><t t-esc="mo.product_id.display_name"/></td>
+                                        <td style="padding: 4px; width: 20%;"><t t-esc="int(mo.product_qty)"/> db</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+
+                        <table cellspacing="0" cellpadding="0" style="border-color: white !important; width: 100%; border-collapse: collapse; table-layout: fixed;">
+                            <tbody>
+                                <t t-foreach="group[1]" t-as="line">
+                                    <t t-set="val_x" t-value="line.product_id.size_x"/>
+                                    <t t-set="val_y" t-value="line.product_id.size_y"/>
+                                    <t t-set="val_z" t-value="line.product_id.size_z"/>
+
+                                    <tr style="font-size: 16px;">
+                                                
+                                        <td style="width: 30%; padding: 8px 4px; border-bottom: 1px solid black !important;">
+                                            <t t-esc="line.product_id.name"/>
+                                        </td>
+                                        
+                                        <td style="width: 15%; padding: 8px 4px; border-bottom: 1px solid black !important;">
+                                            <t t-esc="line.product_id.default_code or ''"/>
+                                        </td>
+
+                                        <td style="width: 20%; padding: 8px 4px; border-bottom: 1px solid black !important; text-align: center;">
+                                            <t t-esc="int(val_x + 2) if val_x > 0 else int(val_x)"/> X 
+                                            <t t-esc="int(val_y + 2) if val_y > 0 else int(val_y)"/>
+                                        </td>
+
+                                        <td style="width: 20%; padding: 8px 4px; border-bottom: 1px solid black !important; text-align: center;">
+                                            <t t-esc="int(val_x)"/> X 
+                                            <t t-esc="int(val_y)"/>
+                                        </td>
+
+                                        <td style="width: 15%; padding: 8px 4px; border-bottom: 1px solid black !important; text-align: right; font-weight: bold;">
+                                            <t t-esc="int(line.product_uom_qty)"/> db
+                                        </td>
+                                    </tr>
+
+                                </t>
+                            </tbody>
+                        </table>
+
+                    </div> 
+                </t>
+            </t>
+            </t>
+        </div>
+    </t>
+</template>
+</odoo>

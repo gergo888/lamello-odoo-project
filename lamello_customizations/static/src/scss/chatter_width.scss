@@ -1,0 +1,36 @@
+// Keskeny chatter - csak ha be van kapcsolva
+.o_user_narrow_chatter {
+    .o_action_manager {
+
+        // 2. A Form lap (sheet) szélességének növelése
+        .o_form_renderer {    
+            .o_form_sheet_bg {
+                max-width: none !important;
+            }
+        }
+    }
+
+    .o_action_manager {
+        .o-mail-ChatterContainer.o-aside, 
+        .o-mail-Form-chatter.o-aside {
+            width: 350px !important;
+            min-width: 350px !important;
+            max-width: 350px !important;
+            flex-basis: 350px !important;
+            --Chatter-asideExtraWidth: 0px !important;
+
+            .o-mail-Chatter-topbar {
+                flex-wrap: wrap !important;
+                height: auto !important;
+                min-height: 45px;
+                overflow: visible !important;
+                padding-bottom: 10px;
+                
+                .btn {
+                    margin-bottom: 4px !important;
+                    margin-top: 4px !important;
+                }
+            }
+        }
+    }
+}
