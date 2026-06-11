@@ -96,7 +96,7 @@
         </xpath>
         
         <field name="origin" position="after">
-          <field name="batch_id" readonly="1" invisible="picking_type_code != 'internal'"/>
+          <field name="lamello_batch_id" readonly="1" invisible="picking_type_code != 'internal'"/>
           <field name="delivery_year" invisible="picking_type_code != 'outgoing'"/>
           <field name="delivery_week" invisible="picking_type_code != 'outgoing'"/>
           <field name="type" invisible="picking_type_code != 'outgoing'"/>
@@ -132,7 +132,7 @@
 
   
         <xpath expr="//field[@name='origin']" position="after">
-            <field name="batch_id"
+            <field name="lamello_batch_id"
                    readonly="1"
                    optional="show"/>
         </xpath>
@@ -150,7 +150,7 @@
         <field name="priority">99</field>
         <field name="arch" type="xml">
             <field name="origin" position="after">
-                <field name="batch_id"/>
+                <field name="lamello_batch_id"/>
             </field>
         </field>
     </record>

@@ -677,12 +677,15 @@ class StockPicking(models.Model):
         store=True
     )
     
-    # A batch_id most már egyszerű related mező, így automatikusan frissül
+    # A lamello_batch_id egyszerű related mező, így automatikusan frissül
     # A store=True biztosítja a kereshetőséget és a riportálhatóságot
-    batch_id = fields.Many2one(
-        related='mo_id.batch_id', 
-        string='Ütem', 
-        store=True, 
+    # Megjegyzés: nem nevezhető 'batch_id', mert az ütközik a stock_picking_batch
+    # modul saját 'batch_id' (Many2one -> stock.picking.batch) mezőjével.
+    lamello_batch_id = fields.Many2one(
+        'lamello.batch',
+        related='mo_id.batch_id',
+        string='Ütem',
+        store=True,
         readonly=True
     )
 
