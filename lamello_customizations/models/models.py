@@ -223,6 +223,7 @@ class Batch(models.Model):
         'batch_id',
         string='Gyártási megrendelések'
     )
+    active = fields.Boolean(default=True)
     
     # Eladható termékek gyártási rendelései
     sale_mo_ids = fields.One2many(
@@ -357,6 +358,10 @@ class Batch(models.Model):
                 split_pickings.with_context(skip_immediate=True).button_validate()
 
         parent_mos.action_assign()
+
+    def unlink(self):
+        self.write({'active': False})
+        return True
 
     def action_open_mo_wizard(self):
         self.ensure_one()

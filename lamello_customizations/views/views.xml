@@ -540,6 +540,7 @@
               <field name="number"/>
               <field name="color"/>
               <field name="product_family_id"/>
+              <field name="active" invisible="1"/>
             </group>
             <notebook>
               
