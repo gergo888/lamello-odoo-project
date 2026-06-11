@@ -14,6 +14,7 @@ from lxml import etree
 from logging import getLogger
 _logger = getLogger(__name__)
 
+# feature
 
 class ProductFamily(models.Model):
     _name = 'lamello.productfamily'
