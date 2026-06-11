@@ -19,7 +19,9 @@
           <field name="product_families" widget="many2many_tags"/>
           <field name="delivery_year"/>
           <field name="delivery_week"/>
+          <!--
           <field name="sale_order_group_by_week_and_partner"/>
+          -->
           <field name="commitment_date"/>          
         </field>
         
@@ -180,6 +182,7 @@
     </record>
 
     <!-- egyedi outgoing list -->
+    <!--
     <record model="ir.ui.view" id="lamello_stock_picking_tree_to_invoice">
         <field name="name">lamello.picking.tree.custom</field>
         <field name="model">stock.picking</field>
@@ -195,7 +198,8 @@
             </field>
         </field>
     </record>
-
+    -->
+    <!--
     <record id="action_picking_to_invoice" model="ir.actions.act_window">
         <field name="name">Számlázandó</field>
         <field name="res_model">stock.picking</field>
@@ -206,8 +210,9 @@
           (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
           (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
     </record>
-
+    -->
     <!-- egyedi outgoing list megnyitása, szűrővel a from értelmetlennek tűnik -->
+    <!--
     <record id="action_lamello_picking_tree_ready" model="ir.actions.act_window">
             <field name="name">To Do</field>
             <field name="res_model">stock.picking</field>
@@ -218,8 +223,9 @@
                 (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
     </record>
-
+    -->
     <!-- egyedi outgoing list megnyitása, a from értelmetlennek tűnik -->
+    <!--
     <record id="action_lamello_picking_tree_outgoing" model="ir.actions.act_window">
             <field name="name">Deliveries</field>
             <field name="res_model">stock.picking</field>
@@ -230,12 +236,15 @@
                 (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
     </record>
+    -->
 
+    <!--
     <menuitem id="menu_picking_to_invoice"
           name="Számlázandó"
           parent="stock.menu_stock_root"
           action="action_picking_to_invoice"
           sequence="150"/>
+    -->
 
     <!-- product.template -->
     <record model="ir.ui.view" id="lamello_product_template_form">
