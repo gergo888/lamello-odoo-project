@@ -101,7 +101,7 @@
         <!--
         </xpath>
         -->
-        
+
         <field name="origin" position="after">
           <field name="lamello_batch_id" readonly="1" invisible="picking_type_code != 'internal'"/>
           <field name="delivery_year" invisible="picking_type_code != 'outgoing'"/>
@@ -187,7 +187,7 @@
     </record>
 
     <!-- egyedi outgoing list -->
-    <!--
+    
     <record model="ir.ui.view" id="lamello_stock_picking_tree_to_invoice">
         <field name="name">lamello.picking.tree.custom</field>
         <field name="model">stock.picking</field>
@@ -198,7 +198,6 @@
             <field name="origin" position="after">
                 <field name="delivery_year"/>
                 <field name="delivery_week"/>
-                <field name="invoiced"/>
                 <field name="type"/>
             </field>
         </field>
