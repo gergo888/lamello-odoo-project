@@ -10,7 +10,7 @@
     <t t-if="o.delivery_slip_type == 'export'">
         <div id="informations" class="row mb-4">
             <div t-if="o.delivery_week" class="col-2 mb-2" name="div_delivery_week">
-                <strong>Woche<br/>Hét</strong>
+                <strong>Woche<br/>Hét teszt</strong>
                 <div t-field="o.delivery_week" class="m-0"/>
             </div>
 
