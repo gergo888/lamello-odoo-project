@@ -799,29 +799,29 @@ class StockPickingType(models.Model):
 
     def get_stock_picking_action_res_model(self):
         action = super(StockPickingType, self).get_stock_picking_action_res_model()
-        custom_view_id = self.env.ref('lamello_customizations.lamello_stock_picking_tree_custom').id        
-        if self.code == 'outgoing':
-            action['views'] = [
-                (custom_view_id, 'tree'),
-                (self.env.ref('stock.view_picking_form').id, 'form')
-            ]
+        # custom_view_id = self.env.ref('lamello_customizations.lamello_stock_picking_tree_custom').id
+        # if self.code == 'outgoing':
+        #     action['views'] = [
+        #         (custom_view_id, 'tree'),
+        #         (self.env.ref('stock.view_picking_form').id, 'form')
+        #     ]
         return action
 
     # felső link
     def get_stock_picking_action_picking_type(self):
-        if self.code == 'outgoing':
-            return self._get_action('lamello_customizations.action_lamello_picking_tree_outgoing')
-        elif self.code == 'internal':
-            return self._get_action('lamello_customizations.action_lamello_picking_tree_internal')            
+        # if self.code == 'outgoing':
+        #     return self._get_action('lamello_customizations.action_lamello_picking_tree_outgoing')
+        if self.code == 'internal':
+            return self._get_action('lamello_customizations.action_lamello_picking_tree_internal')
         else:
             return super(StockPickingType, self).get_stock_picking_action_picking_type()
 
     # gomb, ready filter
     def get_action_picking_tree_ready(self):
-        if self.code == 'outgoing':
-            return self._get_action('lamello_customizations.action_lamello_picking_tree_ready')
-        elif self.code == 'internal':
-            return self._get_action('lamello_customizations.action_lamello_picking_tree_ready_internal')            
+        # if self.code == 'outgoing':
+        #     return self._get_action('lamello_customizations.action_lamello_picking_tree_ready')
+        if self.code == 'internal':
+            return self._get_action('lamello_customizations.action_lamello_picking_tree_ready_internal')
         else:
             return self._get_action('stock.action_picking_tree_ready')
 
