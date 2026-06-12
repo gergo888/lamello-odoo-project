@@ -9,7 +9,7 @@
     'category': 'Uncategorized',
     'version': '0.1',
     'license': 'LGPL-3',
-    'depends': ['base', 'product', 'sale', 'mrp', 'l10n_hu_edi',],
+    'depends': ['base', 'product', 'sale', 'mrp', 'l10n_hu_edi', 'stock_picking_batch',],
     'data': [
         'security/res_groups.xml',
         'security/ir.model.access.csv',
@@ -25,6 +25,7 @@
         'report/mrp_report.xml',
         # 'report/report_lamello_stockpicking_operations.xml',
         'report/report_lamello_deliveryslip.xml',
+        'report/report_lamello_consolidated_deliveryslip.xml',
         'views/views.xml',
         'views/templates.xml',
     ],

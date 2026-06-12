@@ -826,6 +826,17 @@ class StockPickingType(models.Model):
             return self._get_action('stock.action_picking_tree_ready')
 
 
+class StockPickingBatch(models.Model):
+    _inherit = 'stock.picking.batch'
+
+    def action_print_consolidated_delivery_note(self):
+        self.ensure_one()
+        partner_ids = set(self.picking_ids.mapped(lambda p: p.partner_id.id))
+        if len(partner_ids) != 1:
+            raise UserError(_("A konszolidált szállítólevél nyomtatásához az ütem összes szállítólevelének azonos partnerhez kell tartoznia."))
+        return self.env.ref('lamello_customizations.action_lamello_report_consolidated_delivery').report_action(self)
+
+
 class StockMove(models.Model):
     _inherit = 'stock.move'
 

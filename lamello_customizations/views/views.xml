@@ -127,7 +127,19 @@
       </field>
 
     </record>
-  
+
+    <!-- stock.picking.batch -->
+    <record model="ir.ui.view" id="lamello_stock_picking_batch_form">
+      <field name="name">lamello.picking.batch.form</field>
+      <field name="model">stock.picking.batch</field>
+      <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_form"/>
+      <field name="arch" type="xml">
+        <button name="action_open_label_layout" position="after">
+          <button name="action_print_consolidated_delivery_note" string="Print Consolidated Delivery Note" type="object" data-hotkey="shift+p"/>
+        </button>
+      </field>
+    </record>
+
   <!--
     <record id="view_picking_tree_batch_only_pc_sfp" model="ir.ui.view">
         <field name="name">stock.picking.tree.batch.pc.sfp</field>
@@ -162,7 +174,7 @@
         </field>
     </record>
 
-    <!-- egyedi internal list megnyitása, felső link -->
+    <!-- egyedi internal list megnyitása, az invetory modulban kanban nézeten a felső link -->
     <record id="action_lamello_picking_tree_internal" model="ir.actions.act_window">
         <field name="name">Internal Transfers</field>
         <field name="res_model">stock.picking</field>
@@ -174,7 +186,7 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
     </record>
 
-    <!-- egyedi internal list megnyitása, ready gomb -->
+    <!-- egyedi internal list megnyitása, az invetory modulban kanban nézeten ready gomb -->
     <record id="action_lamello_picking_tree_ready_internal" model="ir.actions.act_window">
         <field name="name">To Do</field>
         <field name="res_model">stock.picking</field>
@@ -214,7 +226,7 @@
     </record>
     -->
     <!-- egyedi outgoing list megnyitása, szűrővel a from értelmetlennek tűnik -->
-    <!--
+    <!-- FONTOS!!! nem adaj vissza semmi, így máér nem is kell-->
     <record id="action_lamello_picking_tree_ready" model="ir.actions.act_window">
             <field name="name">To Do</field>
             <field name="res_model">stock.picking</field>
@@ -222,10 +234,10 @@
             <field name="domain"></field>
             <field name="context">{'contact_display': 'partner_address', 'search_default_available': 1}</field>
             <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_to_invoice')}),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('lamello_stock_picking_tree_outgoing')}),
                 (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_picking_form')})]"/>
     </record>
-    -->
+    
     <!-- egyedi outgoing list megnyitása, a from értelmetlennek tűnik -->
     <!--
     <record id="action_lamello_picking_tree_outgoing" model="ir.actions.act_window">

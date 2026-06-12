@@ -23,6 +23,15 @@
             <field name="binding_type">report</field>
         </record>
 
+        <record id="action_lamello_report_consolidated_delivery" model="ir.actions.report">
+            <field name="name">Consolidated Delivery Note</field>
+            <field name="model">stock.picking.batch</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">lamello_customizations.report_lamello_consolidated_deliveryslip</field>
+            <field name="report_file">lamello_customizations.report_lamello_consolidated_deliveryslip</field>
+            <field name="print_report_name">'Delivery Note - %s' % (object.name)</field>
+        </record>
+
         <record id="action_report_mo_all_components" model="ir.actions.report">
             <field name="name">MO Komponens Lista</field>
             <field name="model">mrp.production</field>
