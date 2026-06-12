@@ -6,7 +6,8 @@
         </xpath>
 
         <xpath expr="//table[@name='invoice_line_table']" position="inside">
-            <tbody t-if="o.account_template_type == 'export'" class="invoice_tbody">                
+            <tbody t-if="o.account_template_type == 'export'" class="invoice_tbody">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang or o.env.user.lang)"/>
                 <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
                 <t t-set="display_taxes" t-value="any(l.tax_ids for l in o.invoice_line_ids)"/>
                 <!--

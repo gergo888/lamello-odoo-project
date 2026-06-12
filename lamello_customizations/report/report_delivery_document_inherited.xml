@@ -2,6 +2,10 @@
 <odoo>
 <template id="report_delivery_document_inherited" inherit_id="stock.report_delivery_document">
 
+    <xpath expr="//div[@id='informations']" position="before">
+        <t t-set="o" t-value="o.with_context(lang=o._get_report_lang())"/>
+    </xpath>
+
     <xpath expr="//div[@id='informations']" position="attributes">
         <attribute name="t-if">o.delivery_slip_type != 'export'</attribute>
     </xpath>

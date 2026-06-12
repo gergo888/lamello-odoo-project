@@ -5,6 +5,7 @@
             <t t-call="web.external_layout">
                 <t t-set="pickings" t-value="o.picking_ids"/>
                 <t t-set="partner" t-value="pickings[:1].partner_id"/>
+                <t t-set="o" t-value="o.with_context(lang=partner.lang or o.env.user.lang)"/>
 
                 <t t-set="address">
                     <div name="div_outgoing_address">

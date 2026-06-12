@@ -35,7 +35,7 @@ class ProductCategory(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    invoice_name = fields.Char(string='Számlázási név')
+    invoice_name = fields.Char(string='Számlázási név', translate=True)
     component_code = fields.Char(string='Alkatrészkód')
     
     product_family_id = fields.Many2one('lamello.productfamily', string='Termékcsalád', compute='_compute_product_family', store=True)
@@ -94,7 +94,7 @@ class ProductTemplate(models.Model):
 class Product(models.Model):
     _inherit = 'product.product'
 
-    invoice_name = fields.Char(string='Számlázási név')
+    invoice_name = fields.Char(string='Számlázási név', translate=True)
     component_code = fields.Char(string='Alkatrészkód', compute='_compute_component_name', store=True, readonly=False)
 
     description = fields.Html('Description', translate=True)
