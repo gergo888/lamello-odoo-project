@@ -830,6 +830,8 @@ class StockPickingType(models.Model):
 class StockPickingBatch(models.Model):
     _inherit = 'stock.picking.batch'
 
+    note = fields.Html('Notes')
+
     def action_print_consolidated_delivery_note(self):
         self.ensure_one()
         partner_ids = set(self.picking_ids.mapped(lambda p: p.partner_id.id))

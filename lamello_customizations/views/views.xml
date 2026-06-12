@@ -137,6 +137,9 @@
         <button name="action_open_label_layout" position="after">
           <button name="action_print_consolidated_delivery_note" string="Print Consolidated Delivery Note" type="object" data-hotkey="shift+p"/>
         </button>
+        <xpath expr="//notebook" position="after">
+          <field name="note" placeholder="Notes..."/>
+        </xpath>
       </field>
     </record>
 

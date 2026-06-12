@@ -139,6 +139,12 @@
                         </tbody>
                     </table>
                     <div class="oe_structure"></div>
+
+                    <div t-if="o.note" name="batch_note" class="mt-3">
+                        <strong>Notes</strong>
+                        <div t-field="o.note"/>
+                    </div>
+                    <div class="oe_structure"></div>
                 </div>
             </t>
         </t>
