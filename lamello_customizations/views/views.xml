@@ -78,8 +78,9 @@
             <attribute name="invisible">state == 'done' and picking_type_code == 'outgoing'</attribute>
         </xpath>
         -->
-
+        <!--
         <xpath expr="//button[@name='%(stock.action_report_delivery)d']" position="after">
+        -->
         <!--
             <button name="action_print_delivery_slip" 
                     string="Print" 
@@ -88,6 +89,7 @@
                     groups="base.group_user" 
                     data-hotkey="o"/>
                     -->
+                    <!--
             <button name="action_custom_create_invoice" 
                     string="Számla létrehozása" 
                     type="object" 
@@ -95,7 +97,10 @@
                     invisible="picking_type_code != 'outgoing' or state != 'done' or invoiced"
                     groups="base.group_user" 
                     confirm="Biztosan létre szeretnéd hozni a számlát a kiszállított mennyiségek alapján?"/>
+                    -->
+        <!--
         </xpath>
+        -->
         
         <field name="origin" position="after">
           <field name="lamello_batch_id" readonly="1" invisible="picking_type_code != 'internal'"/>
