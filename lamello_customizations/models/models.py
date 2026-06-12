@@ -15,6 +15,7 @@ from logging import getLogger
 _logger = getLogger(__name__)
 
 # feature
+# commit
 
 class ProductFamily(models.Model):
     _name = 'lamello.productfamily'
