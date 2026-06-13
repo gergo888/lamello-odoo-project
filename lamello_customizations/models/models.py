@@ -177,13 +177,13 @@ class Product(models.Model):
                 except (ValueError, TypeError):
                     continue
 
-                if "szélesség" in attr_name or "x" in attr_name:
+                if x_counter == 0 and ("szélesség" in attr_name or "x" in attr_name):
                     x = value
                     x_counter += 1
-                elif "magasság" in attr_name or "y" in attr_name:
+                elif y_counter == 0 and ("magasság" in attr_name or "y" in attr_name):
                     y = value
                     y_counter += 1
-                elif "hosszúság" in attr_name or "mélység" in attr_name or "z" in attr_name:
+                elif z_counter == 0 and ("hosszúság" in attr_name or "mélység" in attr_name or "z" in attr_name):
                     z = value
                     z_counter += 1
 
