@@ -103,6 +103,7 @@ class Product(models.Model):
     size_y = fields.Integer(string='Y mm', compute='_compute_sizes', inverse='_inverse_size_y', store=True)
     size_z = fields.Integer(string='Z mm', compute='_compute_sizes', inverse='_inverse_size_z', store=True)
     dimensions = fields.Char(string='Méret', compute='_compute_dimensions', store=True)
+    volume = fields.Float(compute='_compute_dimensions', store=True, readonly=False)
     old_pp_id = fields.Integer()
 
     product_codes = fields.Char(
@@ -147,6 +148,7 @@ class Product(models.Model):
             # For variant products: read from product_template_attribute_value_ids
             # For no-variant products (single product.product per template): fall back
             # to template attribute lines, iterating over each line's single value.
+
             if product.product_template_attribute_value_ids:
                 attr_pairs = [
                     (pav.attribute_id.name.lower(), pav.name)
@@ -160,6 +162,15 @@ class Product(models.Model):
                 ]
 
             for attr_name, val_name in attr_pairs:
+                if "méret" in attr_name:
+                    match = re.fullmatch(r'\s*(\d+)\s*x\s*(\d+)\s*x\s*(\d+)\s*', val_name or '')
+                    if match:
+                        x, y, z = (int(g) for g in match.groups())
+                        x_counter += 1
+                        y_counter += 1
+                        z_counter += 1
+                        continue
+
                 try:
                     value = int(val_name)
                 except (ValueError, TypeError):
@@ -171,7 +182,7 @@ class Product(models.Model):
                 elif "magasság" in attr_name or "y" in attr_name:
                     y = value
                     y_counter += 1
-                elif "mélység" in attr_name or "z" in attr_name:
+                elif "hosszúság" in attr_name or "mélység" in attr_name or "z" in attr_name:
                     z = value
                     z_counter += 1
 
@@ -200,6 +211,9 @@ class Product(models.Model):
             
             # Összefűzzük "x" jellel, pl: "100 x 50 x 20"
             product.dimensions = " x ".join(res) if res else ""
+
+            # size_x/y/z mm-ben vannak, a volume m3-ben kell
+            product.volume = (product.size_x * product.size_y * product.size_z) / 1e9
             
 
 class Batch(models.Model):
