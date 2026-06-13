@@ -164,7 +164,7 @@ class Product(models.Model):
             for attr_name, val_name in attr_pairs:
 
                 if "méret" in attr_name:
-                    match = re.fullmatch(r'\s*(\d+)\s*x\s*(\d+)\s*x\s*(\d+)\s*', val_name or '')
+                    match = re.fullmatch(r'\s*(\d+)\s*x\s*(\d+)\s*x\s*(\d+)\s*', val_name or '', re.IGNORECASE)
                     if match:
                         x, y, z = (int(g) for g in match.groups())
                         x_counter += 1
