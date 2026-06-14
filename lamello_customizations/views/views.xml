@@ -144,9 +144,17 @@
         <xpath expr="//notebook" position="after">
           <field name="note" placeholder="Notes..."/>
         </xpath>
+      </field>
+    </record>
 
-        <xpath expr="//field[@name='move_line_ids']//list/field[@name='product_id']" position="after">
-          <field name="invoice_name"/>
+    <!-- stock.move.line list inside batch detailed operations -->
+    <record model="ir.ui.view" id="lamello_stock_move_line_batch_list">
+      <field name="name">lamello.stock.move.line.batch.list</field>
+      <field name="model">stock.move.line</field>
+      <field name="inherit_id" ref="stock_picking_batch.view_move_line_tree"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='product_id']" position="after">
+          <field name="invoice_name" optional="show"/>
         </xpath>
       </field>
     </record>
