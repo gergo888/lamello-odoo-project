@@ -916,6 +916,7 @@ class StockMoveLine(models.Model):
 
     parcel_qty = fields.Integer(string='Csomag db', compute='_compute_parcel_qty', store=True, readonly=False)
     line_parcel_qty = fields.Integer(string='Csomag db összesen', compute='_compute_total_parcel_weight')
+    invoice_name = fields.Char(related='product_id.invoice_name', string='Számlázási név', readonly=True)
 
     @api.depends('move_id.parcel_qty')
     def _compute_parcel_qty(self):
