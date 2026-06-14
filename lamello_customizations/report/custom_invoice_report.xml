@@ -75,17 +75,22 @@
                                         <span t-field="line.name" t-options="{'widget': 'text'}"/>
                                     </td>
                                     -->
+
                                     <td name="account_invoice_line_name" t-att-class="padding_class">
 
                                         <!--
                                         <t t-set="display_name" t-value="line.product_id.invoicing_name or line.name or ''"/>
                                         <span t-out="('—— ' if line.sale_line_ids[:1].linked_line_id else '') + display_name" t-options="{'widget': 'text'}"/>
                                         -->
+                                        
+                                        <t t-set="used_name" t-value="line.product_id.invoice_name or line.product_id.product_tmpl_id.invoice_name or line.product_id.product_tmpl_id.name or ''"/>
+
                                         <t t-if="line.product_id.default_code">
-                                            <t t-set="product_name" t-value="'[' + (line.product_id.default_code or '') + '] ' + (line.product_id.invoice_name or '')"/>
+                                            <t t-set="product_name" t-value="'[' + (line.product_id.default_code or '') + '] ' + used_name"/>
                                         </t>
+
                                         <t t-if="not line.product_id.default_code">
-                                            <t t-set="product_name" t-value="line.product_id.invoice_name or line.name or ''"/>       
+                                            <t t-set="product_name" t-value="used_name"/>
                                         </t>
                                         <span t-out="('-- ' if line.sale_line_ids[:1].linked_line_id else '') + product_name" t-options="{'widget': 'text'}"/>
 
@@ -124,11 +129,13 @@
                                     </td>
                                 </t>
                             </tr>
+                            <!--
                             <tr t-if="is_product and line.product_id.invoice_name">
                                 <td t-att-class="padding_class" colspan="99">
                                     <span t-field="line.product_id.invoice_name"/>
                                 </td>
                             </tr>
+                            -->
                         </t>
                     </t>
                 </t>
@@ -218,11 +225,13 @@
                                     </td>
                                 </t>
                             </tr>
+                            <!--
                             <tr t-if="is_product and line.product_id.invoice_name">
                                 <td t-att-class="padding_class" colspan="99">
                                     <span t-field="line.product_id.invoice_name"/>
                                 </td>
                             </tr>
+                            -->
                         </t>
                     </t>
                 </t>
