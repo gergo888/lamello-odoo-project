@@ -859,6 +859,7 @@ class StockMove(models.Model):
     _inherit = 'stock.move'
 
     parcel_qty = fields.Integer(string='Csomag db', compute='_compute_parcel_qty', store=True, readonly=False)
+    invoice_name = fields.Char(related='product_id.invoice_name', string='Számlázási név', readonly=True)
 
     @api.depends('sale_line_id.parcel_qty', 'product_id.parcel_qty')
     def _compute_parcel_qty(self):

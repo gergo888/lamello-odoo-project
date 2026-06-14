@@ -73,15 +73,53 @@
                     <t t-foreach="order_move_lines" t-as="move_line">
 
                         <tr>
+                            <t-if="move_line.product_id.default_code and move_line.product_id.invoice_name">
+                                <td colspan="1">
+                                    <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                        <span>-- </span>
+                                    </t>
+                                    <span t-field="move_line.product_id.default_code"/>
+                                </td>
+                                <td colspan="2">
+                                    <span t-field="move_line.product_id.invoice_name"/>
+                                </td>
+                            </t-if>
+                            <t-if="not move_line.product_id.default_code and move_line.product_id.invoice_name">
+                                <td colspan="1">
+                                    <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                        <span>-- </span>
+                                    </t>
+                                    <span t-field="move_line.product_id.product_tmpl_id.name"/>
+                                </td>
+                                <td colspan="2">
+                                    <span t-field="move_line.product_id.invoice_name"/>
+                                </td>
+                            </t-if>
+                            <t-if="not move_line.product_id.default_code and not move_line.product_id.invoice_name">
+                                <td colspan="1">
+                                    <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                        <span>-- </span>
+                                    </t>
+                                    <span t-field="move_line.product_id.product_tmpl_id.name"/>
+                                </td>
+                                <td colspan="2">
+                                    <span t-field=""/>
+                                </td>
+                            </t-if>
+
+                            <!--
                             <td colspan="1">
                                 <t t-if="move_line.move_id.sale_line_id.linked_line_id">
-                                    <span>-- </span>
+                                    <span>  </span>
                                 </t>
                                 <span t-field="move_line.product_id.default_code"/>
                             </td>
                             <td colspan="2">
                                 <span t-field="move_line.product_id.invoice_name"/>
                             </td>
+                            -->
+
+
                             <td class="text-end"><span t-out="format_number(move_line.quantity)"/>
                             </td>
                             <td class="text-end">
@@ -102,15 +140,53 @@
                     <t t-foreach="no_ref_lines" t-as="move_line">
 
                         <tr>
+                            
+                            <t-if="move_line.product_id.default_code and move_line.product_id.invoice_name">
+                                <td colspan="1">
+                                    <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                        <span>-- </span>
+                                    </t>
+                                    <span t-field="move_line.product_id.default_code"/>
+                                </td>
+                                <td colspan="2">
+                                    <span t-field="move_line.product_id.invoice_name"/>
+                                </td>
+                            </t-if>
+                            <t-if="not move_line.product_id.default_code and move_line.product_id.invoice_name">
+                                <td colspan="1">
+                                    <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                        <span>-- </span>
+                                    </t>
+                                    <span t-field="move_line.product_id.product_tmpl_id.name"/>
+                                </td>
+                                <td colspan="2">
+                                    <span t-field="move_line.product_id.invoice_name"/>
+                                </td>
+                            </t-if>
+                            <t-if="not move_line.product_id.default_code and not move_line.product_id.invoice_name">
+                                <td colspan="1">
+                                    <t t-if="move_line.move_id.sale_line_id.linked_line_id">
+                                        <span>-- </span>
+                                    </t>
+                                    <span t-field="move_line.product_id.product_tmpl_id.name"/>
+                                </td>
+                                <td colspan="2">
+                                    <span t-field=""/>
+                                </td>
+                            </t-if>
+
+                            <!--
                             <td colspan="1">
                                 <t t-if="move_line.move_id.sale_line_id.linked_line_id">
-                                    <span>-- </span>
+                                    <span>  </span>
                                 </t>
                                 <span t-field="move_line.product_id.default_code"/>
                             </td>
                             <td colspan="2">
                                 <span t-field="move_line.product_id.invoice_name"/>
                             </td>
+                            -->
+                            
                             <td class="text-end"><span t-out="format_number(move_line.quantity)"/>
                             </td>
                             <td class="text-end">
