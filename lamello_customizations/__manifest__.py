@@ -7,7 +7,7 @@
     'author': "My Company",
     'website': "https://www.yourcompany.com",
     'category': 'Uncategorized',
-    'version': '0.1',
+    'version': '19.0.1.0.0',
     'license': 'LGPL-3',
     'depends': ['base', 'product', 'sale', 'mrp', 'l10n_hu_edi', 'stock_picking_batch',],
     'data': [
@@ -17,6 +17,7 @@
         'data/mrp_component_group_data.xml',
         'report/report_delivery_document_inherited.xml',
         'report/custom_invoice_report.xml',
+        'report/report_saleorder_document_inherited.xml',
         'report/report_component_template.xml',
         'report/report_component_template_demand.xml',
         'report/report_picking_template.xml',

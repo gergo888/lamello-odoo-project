@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+<template id="report_saleorder_document_inherited" inherit_id="sale.report_saleorder_document">
+
+    <xpath expr="//td[@name='td_product_name']/span[@t-field='line.name']" position="replace">
+        <t t-if="doc.quotation_template_type == 'export'">
+            <t t-set="used_name" t-value="line.product_id.invoice_name or line.product_id.product_tmpl_id.invoice_name or line.product_id.product_tmpl_id.name or ''"/>
+
+            <t t-if="line.product_id.default_code">
+                <t t-set="product_name" t-value="'[' + (line.product_id.default_code or '') + '] ' + used_name"/>
+            </t>
+
+            <t t-if="not line.product_id.default_code">
+                <t t-set="product_name" t-value="used_name"/>
+            </t>
+
+            <span t-out="('-- ' if line.linked_line_id else '') + product_name" t-options="{'widget': 'text'}"/>
+        </t>
+        <t t-else="">
+            <span t-field="line.name">Bacon Burger</span>
+        </t>
+    </xpath>
+
+</template>
+</odoo>

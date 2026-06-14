@@ -451,6 +451,7 @@ class SaleOrder(models.Model):
     delivery_week = fields.Integer(string='Szállítási hét', required=True, default=lambda self: datetime.now().isocalendar().week)
     product_families = fields.Many2many('lamello.productfamily', string='Termékcsaládok', compute='_compute_product_families', store=True)
     type = fields.Selection([('export', 'Export'), ('domestic', 'Hazai')], string='Típus')
+    quotation_template_type = fields.Selection([('default', 'Alapértelmezett'), ('export', 'Export')], string='Árajánlat sablon')
     sale_order_group_by_week_and_partner = fields.Boolean(string='Kiszállítás csoportosítása hét és partner szerint')
     client_order_ref = fields.Char(string='Hivatkozó referencia')
     batch_id = fields.Many2many('lamello.batch', 'sale_order_batch_rel', 'sale_order_id', 'batch_id', string='Ütem')
@@ -548,6 +549,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     batch_id = fields.Many2one('lamello.batch', string='Ütem')
+    invoice_name = fields.Char(related='product_id.invoice_name', string='Számlázási név', readonly=True)
     order_partner_id = fields.Many2one(
         related='order_id.partner_id', 
         string="Vevő", 
