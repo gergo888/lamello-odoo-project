@@ -936,6 +936,12 @@ class AccountMove(models.Model):
     group_by_so = fields.Boolean('Csoportosítás rendelések szerint')
 
 
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    invoice_name = fields.Char(related='product_id.invoice_name', string='Számlázási név', readonly=True)
+
+
 class ResCompany(models.Model):
     _inherit = 'res.company'
 

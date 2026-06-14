@@ -415,7 +415,11 @@
         <xpath expr="//group[group[@id='header_left_group']]" position="after">
             <group name="szamlazz_beallitasok" string="Számlázási beállítások" invisible="move_type != 'out_invoice'">
                 <field name="account_template_type"/>
-            </group>          
+            </group>
+        </xpath>
+
+        <xpath expr="//field[@name='invoice_line_ids']//list/field[@name='product_id']" position="after">
+            <field name="invoice_name" column_invisible="parent.move_type not in ('out_invoice', 'out_refund')"/>
         </xpath>
       </field>
     </record>
